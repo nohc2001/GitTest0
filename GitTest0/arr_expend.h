@@ -1,5 +1,5 @@
 #define H_ARR_EXPEND
-
+#include <string.h>
 #include <iostream>
 using namespace std;
 
