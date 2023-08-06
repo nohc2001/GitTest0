@@ -1,5 +1,6 @@
 {
     "files.associations": {
         "sstream": "cpp"
-    }
+    },
+    "chat.editor.fontFamily": "Consolas"
 }

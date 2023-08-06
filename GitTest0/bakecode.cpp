@@ -19,7 +19,7 @@ bool cd_eqoper(char *str)
 		return false;
 }
 
-bool bCanBeTextblock(lcstr & a)
+bool bCanBeTextblock(lcstr &a)
 {
 	bool num = false;
 	bool oper = false;
@@ -79,8 +79,7 @@ bool bCanBeTextblock(lcstr & a)
 			return false;
 		}
 
-		bool n1 = (('0' <= c && c <= '9') || ('a' <= c && c <= 'z')) || (('A' <= c && c <= 'Z')
-																		 || c == '_');
+		bool n1 = (('0' <= c && c <= '9') || ('a' <= c && c <= 'z')) || (('A' <= c && c <= 'Z') || c == '_');
 		if (n1)
 		{
 			if (oper == true)
@@ -118,7 +117,7 @@ typedef enum class TBT
 	_null = 8
 } TBT;
 
-TBT DecodeTextBlock(lcstr & t)
+TBT DecodeTextBlock(lcstr &t)
 {
 	if (t == "true" || t == "false")
 	{
@@ -200,7 +199,7 @@ TBT DecodeTextBlock(lcstr & t)
 			bstr = false;
 	}
 
-	delete[]intarray;
+	delete[] intarray;
 
 	if (bnum)
 	{
@@ -212,7 +211,6 @@ TBT DecodeTextBlock(lcstr & t)
 		{
 			return TBT::_value_integer;
 		}
-
 	}
 	if (bstr)
 		return TBT::_str;
@@ -228,12 +226,12 @@ TBT DecodeTextBlock(lcstr & t)
 	}
 }
 
-lcstr* GetCodeTXT(const char *filename, FM_System0* fm)
+lcstr *GetCodeTXT(const char *filename, FM_System0 *fm)
 {
 	FILE *fp = fopen(filename, "rt");
 	if (fp)
 	{
-		lcstr* codetxt = (lcstr*)fm->_New(sizeof(lcstr), true);
+		lcstr *codetxt = (lcstr *)fm->_New(sizeof(lcstr), true);
 		codetxt->Init(10, false);
 		int max = 0;
 		fseek(fp, 0, SEEK_END);
@@ -302,14 +300,14 @@ typedef struct code_sen
 	char **sen;
 	int maxlen;
 	codeKind ck;
-	vecarr < int *>*codeblocks = nullptr;
+	vecarr<int *> *codeblocks = nullptr;
 	FM_System0 *fm;
 
 	int start_line = 0;
 	int end_line = 0;
 };
 
-void dbg_codesen(code_sen * cs)
+void dbg_codesen(code_sen *cs)
 {
 	switch (cs->ck)
 	{
@@ -366,7 +364,7 @@ void dbg_codesen(code_sen * cs)
 		cout << "{" << endl;
 		for (int i = 0; i < cs->codeblocks->size(); ++i)
 		{
-			dbg_codesen(reinterpret_cast < code_sen * >(cs->codeblocks->at(i)));
+			dbg_codesen(reinterpret_cast<code_sen *>(cs->codeblocks->at(i)));
 		}
 		cout << "closed_ : }" << endl;
 	}
@@ -397,7 +395,7 @@ typedef struct NamingData
 typedef struct operator_data
 {
 	const char *symbol;
-	char mod = 'f';				// f : front / o - asmoper
+	char mod = 'f'; // f : front / o - asmoper
 	int startop = 0;
 	int endop = 0;
 };
@@ -423,12 +421,12 @@ typedef enum class blockstate
 typedef struct block_data
 {
 	byte8 *start_pc;
-	vecarr < NamingData > variable_data;
+	vecarr<NamingData> variable_data;
 	int add_address_up = 0;
 	blockstate bs;
-	uint64_t parameter[5] = { };
-	vecarr < int >*breakpoints;
-	vecarr < int >*continuepoints;
+	uint64_t parameter[5] = {};
+	vecarr<int> *breakpoints;
+	vecarr<int> *continuepoints;
 
 	bool ifin = false;
 	int lastcsindex = 0;
@@ -439,19 +437,19 @@ typedef struct func_data
 {
 	lcstr name;
 	byte8 *start_pc;
-	vecarr < NamingData > param_data;	// save sizeoftype
+	vecarr<NamingData> param_data; // save sizeoftype
 	type_data *returntype;
 };
 
 typedef struct struct_data
 {
 	lcstr name;
-	vecarr < NamingData > member_data;
+	vecarr<NamingData> member_data;
 };
 
 typedef struct temp_mem
 {
-	vecarr < byte8 > mem;
+	vecarr<byte8> mem;
 	int memsiz = 0;
 	int valuetype = 0;
 	type_data *valuetype_detail;
@@ -585,36 +583,36 @@ casting_type get_cast_type(int type0, int type1)
 
 typedef struct instruct_data
 {
-	char name[64] = { };
+	char name[64] = {};
 	int param_num = 0;
-	int param_typesiz[4] = { };
+	int param_typesiz[4] = {};
 };
 
 class InsideCode_Bake
 {
-  public:
-	FM_System0 * fm;
+public:
+	FM_System0 *fm;
 
 	// execute var
 	uint32_t max_mem_byte = 40960;
 	byte8 *mem = nullptr;
-	vecarr < byte8 > datamem;
+	vecarr<byte8> datamem;
 
 	static constexpr uint32_t max_instruction = 256;
-	void *inst[max_instruction] = { };
+	void *inst[max_instruction] = {};
 
 	static constexpr int max_casting_type = 20;
-	void *cast[max_casting_type] = { };
+	void *cast[max_casting_type] = {};
 
 	static constexpr int max_dbgtype = 9;
-	void *dbgt[max_dbgtype] = { };
-	void *inpt[max_dbgtype] = { };
+	void *dbgt[max_dbgtype] = {};
+	void *inpt[max_dbgtype] = {};
 
-	circularArray < uint64_t > _as;
-	circularArray < uint64_t > _bs;
+	circularArray<uint64_t> _as;
+	circularArray<uint64_t> _bs;
 
-	byte8 *pc = 0;				// program counter
-	byte8 *sp = 0;				// stack pointer
+	byte8 *pc = 0; // program counter
+	byte8 *sp = 0; // stack pointer
 
 	byte8 **pcb = nullptr;
 	ushort **pcs = nullptr;
@@ -624,11 +622,11 @@ class InsideCode_Bake
 	ushort **sps = nullptr;
 	uint **spi = nullptr;
 
-	vecarr < byte8 * >fsp;
-	vecarr < byte8 * >call_stack;
+	vecarr<byte8 *> fsp;
+	vecarr<byte8 *> call_stack;
 
-	byte8 *rfsp = 0;			// function stack pos
-	byte8 *lfsp = 0;			// last function stack pos
+	byte8 *rfsp = 0; // function stack pos
+	byte8 *lfsp = 0; // last function stack pos
 
 	byte8 **rfspb = nullptr;
 	ushort **rfsps = nullptr;
@@ -642,18 +640,18 @@ class InsideCode_Bake
 	uint64_t _b = 0;
 	uint64_t _x = 0;
 	uint64_t _y = 0;
-	uint64_t _la = 0;			// left address
+	uint64_t _la = 0; // left address
 
 	// compile var
-	vecarr < char *>allcode_sen;
+	vecarr<char *> allcode_sen;
 	word_base_sen_sys wbss;
-	vecarr < code_sen * >*csarr;
+	vecarr<code_sen *> *csarr;
 	// infArray < code_sen > sen_arr;
 
-	vecarr < func_data * >functions;
-	vecarr < type_data * >types;
-	vecarr < block_data * >blockstack;
-	vecarr < NamingData * >globalVariables;
+	vecarr<func_data *> functions;
+	vecarr<type_data *> types;
+	vecarr<block_data *> blockstack;
+	vecarr<NamingData *> globalVariables;
 
 	block_data nextbd;
 	struct_data *nextsd;
@@ -668,16 +666,16 @@ class InsideCode_Bake
 	static constexpr int basicoper_max = 19;
 	operator_data basicoper[basicoper_max];
 
-	void release_tempmem(temp_mem * ptr)
+	void release_tempmem(temp_mem *ptr)
 	{
 		ptr->mem.release();
-		fm->_Delete((byte8 *) ptr, sizeof(temp_mem));
+		fm->_Delete((byte8 *)ptr, sizeof(temp_mem));
 		// type_data memeory management reqired.. but how?
 	}
 
 	type_data *create_type(char *nam, int tsiz, char typ, int *strptr)
 	{
-		type_data *td = (type_data *) fm->_New(sizeof(type_data), true);
+		type_data *td = (type_data *)fm->_New(sizeof(type_data), true);
 		td->name.NULLState();
 		td->name.Init(2, false);
 		td->name = nam;
@@ -699,29 +697,29 @@ class InsideCode_Bake
 		return nullptr;
 	}
 
-	type_data *get_sub_type(type_data * t)
+	type_data *get_sub_type(type_data *t)
 	{
-		return reinterpret_cast < type_data * >(t->structptr);
+		return reinterpret_cast<type_data *>(t->structptr);
 	}
 
-	type_data *get_addpointer_type(type_data * td)
+	type_data *get_addpointer_type(type_data *td)
 	{
-		type_data *rtd = (type_data *) fm->_New(sizeof(type_data), true);
+		type_data *rtd = (type_data *)fm->_New(sizeof(type_data), true);
 		rtd->name.NULLState();
 		rtd->name.Init(td->name.size() + 1, false);
 
 		int len = strlen(td->name.c_str());
 		rtd->name.operator=(td->name.c_str());
 		rtd->name.push_back('*');
-		rtd->structptr = reinterpret_cast < int *>(td);
+		rtd->structptr = reinterpret_cast<int *>(td);
 		rtd->typesiz = 4;
 		rtd->typetype = 'p';
 		return rtd;
 	}
 
-	type_data *get_array_type(type_data * td, int size)
+	type_data *get_array_type(type_data *td, int size)
 	{
-		type_data *rtd = (type_data *) fm->_New(sizeof(type_data), true);
+		type_data *rtd = (type_data *)fm->_New(sizeof(type_data), true);
 		rtd->name.NULLState();
 		rtd->name.Init(2, false);
 		int len = strlen(td->name.c_str());
@@ -737,7 +735,7 @@ class InsideCode_Bake
 		}
 		rtd->name.push_back(']');
 
-		rtd->structptr = reinterpret_cast < int *>(td);
+		rtd->structptr = reinterpret_cast<int *>(td);
 		rtd->typesiz = td->typesiz * size;
 		rtd->typetype = 'a';
 		return rtd;
@@ -767,7 +765,7 @@ class InsideCode_Bake
 		return nullptr;
 	}
 
-	int get_int_with_basictype(type_data * td)
+	int get_int_with_basictype(type_data *td)
 	{
 		if (td == basictype[1])
 			return 0;
@@ -792,7 +790,7 @@ class InsideCode_Bake
 	{
 	}
 
-	virtual ~ InsideCode_Bake()
+	virtual ~InsideCode_Bake()
 	{
 	}
 
@@ -806,9 +804,9 @@ class InsideCode_Bake
 		return false;
 	}
 
-	sen *get_sen_from_codesen(code_sen * cs)
+	sen *get_sen_from_codesen(code_sen *cs)
 	{
-		sen *rs = (sen *) fm->_New(sizeof(sen), true);
+		sen *rs = (sen *)fm->_New(sizeof(sen), true);
 		rs->NULLState();
 		rs->Init(2, false);
 
@@ -823,7 +821,7 @@ class InsideCode_Bake
 		return rs;
 	}
 
-	void setfm(FM_System0 * fms)
+	void setfm(FM_System0 *fms)
 	{
 		fm = fms;
 		allcode_sen.NULLState();
@@ -837,7 +835,7 @@ class InsideCode_Bake
 
 	void read_inst_table()
 	{
-		FILE *file = fopen("instruction_table.txt", "r");	// Open the file
+		FILE *file = fopen("instruction_table.txt", "r"); // Open the file
 		// in read
 		// mode
 		if (file == nullptr)
@@ -894,23 +892,26 @@ class InsideCode_Bake
 			inst_meta[k].param_num = -1;
 		}
 
-		fclose(file);			// Close the file
+		fclose(file); // Close the file
 
 		for (int i = 0; i < 256; ++i)
 		{
 			cout << i << " : " << inst_meta[i].name << endl;
 		}
 	}
-	
-	void dbg_registers(){
+
+	void dbg_registers()
+	{
 		cout << "a : " << (uint)_as[0] << "(";
-		for(int i=1;i<_as.maxsiz;++i){
-			cout << "|" <<  _as[i];
+		for (int i = 1; i < _as.maxsiz; ++i)
+		{
+			cout << "|" << _as[i];
 		}
 		cout << endl;
 		cout << "b : " << (uint)_bs[0] << "(";
-		for(int i=1;i<_bs.maxsiz;++i){
-			cout << "|" <<  _bs[i];
+		for (int i = 1; i < _bs.maxsiz; ++i)
+		{
+			cout << "|" << _bs[i];
 		}
 		cout << endl;
 		cout << "x : " << (uint)_x << endl;
@@ -920,14 +921,14 @@ class InsideCode_Bake
 	void dbg_stack()
 	{
 		cout << "stack mem" << endl;
-		for (byte8 * ptr = sp; ptr != &mem[max_mem_byte - 1]; ++ptr)
+		for (byte8 *ptr = sp; ptr != &mem[max_mem_byte - 1]; ++ptr)
 		{
 			cout << (int)*ptr << ' ';
 		}
 		cout << endl;
 	}
 
-	code_sen *find_codesen_with_linenum(vecarr < code_sen * >*csa, int line)
+	code_sen *find_codesen_with_linenum(vecarr<code_sen *> *csa, int line)
 	{
 		for (int i = 0; i < csa->size(); ++i)
 		{
@@ -936,8 +937,9 @@ class InsideCode_Bake
 			{
 				if (cs->ck == codeKind::ck_blocks)
 				{
-					return find_codesen_with_linenum(reinterpret_cast < vecarr <
-													 code_sen * >*>(cs->codeblocks), line);
+					return find_codesen_with_linenum(reinterpret_cast<vecarr<
+														 code_sen *> *>(cs->codeblocks),
+													 line);
 				}
 				else
 				{
@@ -960,7 +962,7 @@ class InsideCode_Bake
 		{
 			dbg_codesen(cs);
 		}
-		cout << (int)(pc - mem) << " : " << inst_meta[*pc].name << "(" << (uint) * pc << ")";
+		cout << (int)(pc - mem) << " : " << inst_meta[*pc].name << "(" << (uint)*pc << ")";
 		instruct_data id = inst_meta[*pc];
 		int n;
 		for (int k = 0; k < id.param_num; ++k)
@@ -972,14 +974,12 @@ class InsideCode_Bake
 				cout << " > " << n;
 				break;
 			case 2:
-				n = *reinterpret_cast < ushort * >(pc + 1);
+				n = *reinterpret_cast<ushort *>(pc + 1);
 				cout << " > " << n << "(" << (uint) * (pc + 1) << ", " << (uint) * (pc + 2) << ")";
 				break;
 			case 4:
-				n = *reinterpret_cast < uint * >(pc + 1);
-				cout << " > " << n << "(" << (uint) * (pc + 1) << ", " << (uint) * (pc +
-																					2) << ", " <<
-					(uint) * (pc + 3) << ", " << (uint) * (pc + 4) << ")";
+				n = *reinterpret_cast<uint *>(pc + 1);
+				cout << " > " << n << "(" << (uint) * (pc + 1) << ", " << (uint) * (pc + 2) << ", " << (uint) * (pc + 3) << ", " << (uint) * (pc + 4) << ")";
 				break;
 			}
 		}
@@ -996,7 +996,7 @@ class InsideCode_Bake
 			}
 			if (mem[i] == 214 || mem[i] == 215)
 			{
-				cout << i << "\t:" << inst_meta[mem[i]].name << "(" << (uint) mem[i] << ")";
+				cout << i << "\t:" << inst_meta[mem[i]].name << "(" << (uint)mem[i] << ")";
 				uint strmax = 0;
 				instruct_data id = inst_meta[mem[i]];
 				int n;
@@ -1006,23 +1006,21 @@ class InsideCode_Bake
 					{
 					case 1:
 						++i;
-						n = (uint) mem[i];
+						n = (uint)mem[i];
 						cout << " > " << n;
 						break;
 					case 2:
 						++i;
-						n = *reinterpret_cast < ushort * >(&mem[i]);
-						cout << " > " << n << "(" << (uint) mem[i] << ", " << (uint) mem[i +
-																						 1] << ")";
+						n = *reinterpret_cast<ushort *>(&mem[i]);
+						cout << " > " << n << "(" << (uint)mem[i] << ", " << (uint)mem[i + 1] << ")";
 						i += 1;
 						break;
 					case 4:
 						++i;
-						n = *reinterpret_cast < uint * >(&mem[i]);
+						n = *reinterpret_cast<uint *>(&mem[i]);
 						strmax = n;
-						cout << " > " << n << "(" << (uint) mem[i] << ", " << (uint) mem[i +
-																						 1] << ", "
-							<< (uint) mem[i + 2] << ", " << (uint) mem[i + 3] << ")";
+						cout << " > " << n << "(" << (uint)mem[i] << ", " << (uint)mem[i + 1] << ", "
+							 << (uint)mem[i + 2] << ", " << (uint)mem[i + 3] << ")";
 						i += 3;
 						break;
 					}
@@ -1036,7 +1034,7 @@ class InsideCode_Bake
 				cout << endl;
 				i += strmax + 1;
 			}
-			cout << i << "\t:" << inst_meta[mem[i]].name << "(" << (uint) mem[i] << ")";
+			cout << i << "\t:" << inst_meta[mem[i]].name << "(" << (uint)mem[i] << ")";
 			instruct_data id = inst_meta[mem[i]];
 			int n;
 			for (int k = 0; k < id.param_num; ++k)
@@ -1045,21 +1043,19 @@ class InsideCode_Bake
 				{
 				case 1:
 					++i;
-					n = (uint) mem[i];
+					n = (uint)mem[i];
 					cout << " > " << n;
 					break;
 				case 2:
 					++i;
-					n = *reinterpret_cast < ushort * >(&mem[i]);
-					cout << " > " << n << "(" << (uint) mem[i] << ", " << (uint) mem[i + 1] << ")";
+					n = *reinterpret_cast<ushort *>(&mem[i]);
+					cout << " > " << n << "(" << (uint)mem[i] << ", " << (uint)mem[i + 1] << ")";
 					i += 1;
 					break;
 				case 4:
 					++i;
-					n = *reinterpret_cast < uint * >(&mem[i]);
-					cout << " > " << n << "(" << (uint) mem[i] << ", " << (uint) mem[i +
-																					 1] << ", " <<
-						(uint) mem[i + 2] << ", " << (uint) mem[i + 3] << ")";
+					n = *reinterpret_cast<uint *>(&mem[i]);
+					cout << " > " << n << "(" << (uint)mem[i] << ", " << (uint)mem[i + 1] << ", " << (uint)mem[i + 2] << ", " << (uint)mem[i + 3] << ")";
 					i += 3;
 					break;
 				}
@@ -1068,7 +1064,7 @@ class InsideCode_Bake
 		}
 	}
 
-	void dbg_bakecode(vecarr < code_sen * >*csa, int sav)
+	void dbg_bakecode(vecarr<code_sen *> *csa, int sav)
 	{
 		// cout << "all asm :" << endl;
 		int save = sav;
@@ -1086,8 +1082,8 @@ class InsideCode_Bake
 			}
 			if (cs->ck == codeKind::ck_blocks)
 			{
-				vecarr < code_sen * >*css =
-					reinterpret_cast < vecarr < code_sen * >*>(cs->codeblocks);
+				vecarr<code_sen *> *css =
+					reinterpret_cast<vecarr<code_sen *> *>(cs->codeblocks);
 				dbg_bakecode(css, save);
 				save = css->last()->end_line + 1;
 			}
@@ -1113,7 +1109,7 @@ class InsideCode_Bake
 		call_stack.NULLState();
 		call_stack.Init(2, false);
 
-		char *name[8] = { };
+		char *name[8] = {};
 		name[0] = (char *)fm->_New(4, true);
 		strcpy(name[0], "int");
 		basictype[0] = create_type(name[0], 4, 'b', nullptr);
@@ -1151,7 +1147,7 @@ class InsideCode_Bake
 			types.push_back(basictype[i]);
 		}
 
-		block_data *bd = (block_data *) fm->_New(sizeof(block_data), true);
+		block_data *bd = (block_data *)fm->_New(sizeof(block_data), true);
 		bd->start_pc = &mem[0];
 		bd->add_address_up = 0;
 		bd->variable_data.NULLState();
@@ -1195,8 +1191,8 @@ class InsideCode_Bake
 		lfsp = sp;
 		rfsp = sp;
 
-		nextbd.breakpoints = (vecarr < int >*)fm->_New(sizeof(vecarr < int >), true);
-		nextbd.continuepoints = (vecarr < int >*)fm->_New(sizeof(vecarr < int >), true);
+		nextbd.breakpoints = (vecarr<int> *)fm->_New(sizeof(vecarr<int>), true);
+		nextbd.continuepoints = (vecarr<int> *)fm->_New(sizeof(vecarr<int>), true);
 
 		functions.NULLState();
 		functions.Init(2, false);
@@ -1211,7 +1207,7 @@ class InsideCode_Bake
 		_bs.Init(32, fm);
 	}
 
-	void push_word(lcstr & str)
+	void push_word(lcstr &str)
 	{
 		const char *sptr = str.c_str();
 		int len = strlen(sptr);
@@ -1227,7 +1223,7 @@ class InsideCode_Bake
 		{
 			if (strcmp(cstr, wbss.wordlist.at(i)->c_str()) == 0)
 			{
-				fm->_Delete((byte8 *) cstr, len + 1);
+				fm->_Delete((byte8 *)cstr, len + 1);
 				allcode_sen.push_back(wbss.wordlist.at(i)->c_str());
 				return;
 			}
@@ -1237,7 +1233,7 @@ class InsideCode_Bake
 		allcode_sen.push_back(cstr);
 	}
 
-	void set_word(int index, lcstr & str)
+	void set_word(int index, lcstr &str)
 	{
 		const char *sptr = str.c_str();
 		int len = strlen(sptr);
@@ -1249,7 +1245,7 @@ class InsideCode_Bake
 		{
 			if (strcmp(cstr, wbss.wordlist.at(i)->c_str()) == 0)
 			{
-				fm->_Delete((byte8 *) cstr, len + 1);
+				fm->_Delete((byte8 *)cstr, len + 1);
 				allcode_sen[index] = wbss.wordlist.at(i)->c_str();
 				return;
 			}
@@ -1259,13 +1255,14 @@ class InsideCode_Bake
 		allcode_sen[index] = cstr;
 	}
 
-	void AddTextBlocks(lcstr & codetxt)
+	void AddTextBlocks(lcstr &codetxt)
 	{
 		lcstr insstr;
 		insstr.NULLState();
 		insstr.Init(2, false);
 
-		cout << "\n\ntext : \n" << codetxt.c_str() << endl;
+		cout << "\n\ntext : \n"
+			 << codetxt.c_str() << endl;
 		for (int i = 0; i < (int)codetxt.size(); i++)
 		{
 			insstr.push_back(codetxt.at(i));
@@ -1273,8 +1270,7 @@ class InsideCode_Bake
 			{
 				if (i == codetxt.size() - 1)
 				{
-					cout << "siz : " << i << "-" << codetxt.size() << " str : " << insstr.
-						c_str() << endl;
+					cout << "siz : " << i << "-" << codetxt.size() << " str : " << insstr.c_str() << endl;
 					push_word(insstr);
 					continue;
 				}
@@ -1282,8 +1278,7 @@ class InsideCode_Bake
 				if (bCanBeTextblock(insstr) == false)
 				{
 					insstr.pop_back();
-					cout << "siz : " << i << "-" << codetxt.size() << " str : " << insstr.
-						c_str() << endl;
+					cout << "siz : " << i << "-" << codetxt.size() << " str : " << insstr.c_str() << endl;
 					push_word(insstr);
 					insstr.clear();
 				}
@@ -1291,18 +1286,15 @@ class InsideCode_Bake
 				{
 					int inssiz = insstr.size() - 1;
 					char c = insstr.at(inssiz);
-					bool bnor = ((('0' <= c && c <= '9') || ('a' <= c && c <= 'z'))
-								 || ('A' <= c && c <= 'Z') || c == '_');
+					bool bnor = ((('0' <= c && c <= '9') || ('a' <= c && c <= 'z')) || ('A' <= c && c <= 'Z') || c == '_');
 					if (bnor == false)
 					{
 						insstr.pop_back();
-						cout << "siz : " << i << "-" << codetxt.size() << " str : " << insstr.
-							c_str() << endl;
+						cout << "siz : " << i << "-" << codetxt.size() << " str : " << insstr.c_str() << endl;
 						push_word(insstr);
 						insstr.clear();
 						insstr.push_back(c);
-						cout << "siz : " << i << "-" << codetxt.size() << " str : " << insstr.
-							c_str() << endl;
+						cout << "siz : " << i << "-" << codetxt.size() << " str : " << insstr.c_str() << endl;
 						push_word(insstr);
 						insstr.clear();
 						i++;
@@ -1337,8 +1329,7 @@ class InsideCode_Bake
 				lcstr t1;
 				t1 = allcode_sen[i + 1];
 
-				bool bequ = (DecodeTextBlock(t0) == TBT::_operation)
-					&& (DecodeTextBlock(t1) != TBT::_operation);
+				bool bequ = (DecodeTextBlock(t0) == TBT::_operation) && (DecodeTextBlock(t1) != TBT::_operation);
 				if (bequ)
 				{
 					lcstr insstr;
@@ -1465,8 +1456,7 @@ class InsideCode_Bake
 					allcode_sen.erase(i + 1);
 					allcode_sen.erase(i + 1);
 				}
-				else if (strcmp(allcode_sen[i + 1], "\\") == 0
-						 && strcmp(allcode_sen[i + 3], "\'") == 0)
+				else if (strcmp(allcode_sen[i + 1], "\\") == 0 && strcmp(allcode_sen[i + 3], "\'") == 0)
 				{
 					lcstr insstr;
 					insstr = allcode_sen[i];
@@ -1502,7 +1492,7 @@ class InsideCode_Bake
 		insstr.islocal = true;
 	}
 
-	void set_codesen(code_sen * sen, vecarr < char *>&arr, FM_System0 * fm)
+	void set_codesen(code_sen *sen, vecarr<char *> &arr, FM_System0 *fm)
 	{
 		sen->maxlen = arr.size();
 		sen->sen = (char **)fm->_New(sizeof(char *) * sen->maxlen, true);
@@ -1514,14 +1504,14 @@ class InsideCode_Bake
 		// cout << endl; // dbg
 	}
 
-	vecarr < code_sen * >*AddCodeFromBlockData(vecarr < char *>&allcodesen, const char *ScanMod)
+	vecarr<code_sen *> *AddCodeFromBlockData(vecarr<char *> &allcodesen, const char *ScanMod)
 	{
 		// allcode_sen-> allcode_sen
 		// ic -> this
 		// code -> sen_arr
 
-		vecarr < code_sen * >*senarr =
-			(vecarr < code_sen * >*)fm->_New(sizeof(vecarr < code_sen * >), true);
+		vecarr<code_sen *> *senarr =
+			(vecarr<code_sen *> *)fm->_New(sizeof(vecarr<code_sen *>), true);
 		senarr->NULLState();
 		senarr->Init(10, false);
 
@@ -1555,9 +1545,9 @@ class InsideCode_Bake
 						if (strcmp(allcodesen[i + 2], "(") == 0)
 						{
 							// addfunction
-							code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+							code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 							cs->ck = codeKind::ck_addFunction;
-							vecarr < char *>cbs;
+							vecarr<char *> cbs;
 							cbs.NULLState();
 							cbs.Init(3, true);
 							cbs.push_back(allcodesen[i]);
@@ -1628,9 +1618,9 @@ class InsideCode_Bake
 
 							if (addset == false)
 							{
-								code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+								code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 								cs->ck = codeKind::ck_addVariable;
-								vecarr < char *>cbs;
+								vecarr<char *> cbs;
 								cbs.NULLState();
 								cbs.Init(3, true);
 								for (int j = 0; j < k; j++)
@@ -1645,9 +1635,9 @@ class InsideCode_Bake
 							}
 							else
 							{
-								code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+								code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 								cs->ck = codeKind::ck_addsetVariable;
-								vecarr < char *>cbs;
+								vecarr<char *> cbs;
 								cbs.NULLState();
 								cbs.Init(3, true);
 								for (int j = 0; j < v; j++)
@@ -1662,13 +1652,11 @@ class InsideCode_Bake
 							}
 						}
 					}
-					else if (allcodesen.size() > i + 2
-							 && (strcmp(allcodesen[i + 2], "(") == 0
-								 && strcmp(allcodesen[i], "void") == 0))
+					else if (allcodesen.size() > i + 2 && (strcmp(allcodesen[i + 2], "(") == 0 && strcmp(allcodesen[i], "void") == 0))
 					{
-						code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+						code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 						cs->ck = codeKind::ck_addFunction;
-						vecarr < char *>cbs;
+						vecarr<char *> cbs;
 						cbs.NULLState();
 						cbs.Init(3, true);
 						cbs.push_back(allcodesen[i]);
@@ -1700,9 +1688,9 @@ class InsideCode_Bake
 					}
 					else if (strcmp(allcodesen[i], "{") == 0)
 					{
-						code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+						code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 						cs->ck = codeKind::ck_blocks;
-						vecarr < char *>cbs;
+						vecarr<char *> cbs;
 						cbs.NULLState();
 						cbs.Init(2, true);
 
@@ -1710,8 +1698,7 @@ class InsideCode_Bake
 						int h = 1;
 						// cbs.push_back(allcodesen[i]);
 						// cout << "block : { ";
-						while (i + h < allcodesen.size()
-							   && !(strcmp(allcodesen[i + h], "}") == 0 && open == 0))
+						while (i + h < allcodesen.size() && !(strcmp(allcodesen[i + h], "}") == 0 && open == 0))
 						{
 							if (strcmp(allcodesen[i + h], "{") == 0)
 								open++;
@@ -1725,35 +1712,34 @@ class InsideCode_Bake
 						}
 						// cout << "}" << endl;
 
-						// cbs.pop_back(); 
+						// cbs.pop_back();
 						// cbs.erase(0);
 
-						vecarr < code_sen * >*cbv = AddCodeFromBlockData(cbs, "none");
+						vecarr<code_sen *> *cbv = AddCodeFromBlockData(cbs, "none");
 
-						cs->codeblocks = (vecarr < int *>*)fm->_New(sizeof(vecarr < int *>), true);
+						cs->codeblocks = (vecarr<int *> *)fm->_New(sizeof(vecarr<int *>), true);
 						cs->fm = fm;
 						cs->codeblocks->islocal = false;
-						Init_VPTR < vecarr < int *>*>(cs->codeblocks);
+						Init_VPTR<vecarr<int *> *>(cs->codeblocks);
 
 						for (int u = 0; u < (int)cbv->size(); u++)
 						{
-							cs->codeblocks->push_back(reinterpret_cast < int *>((*cbv)[u]));
+							cs->codeblocks->push_back(reinterpret_cast<int *>((*cbv)[u]));
 						}
 
 						cbv->release();
-						fm->_Delete((byte8 *) cbv, sizeof(cbv));
+						fm->_Delete((byte8 *)cbv, sizeof(cbv));
 
 						senarr->push_back(cs);
 
 						i += h;
 						StartI = i + 1;
 					}
-					else if (strcmp(allcodesen[i], "=") == 0
-							 || (strlen(allcodesen[i]) == 2 && allcodesen[i][1] == '='))
+					else if (strcmp(allcodesen[i], "=") == 0 || (strlen(allcodesen[i]) == 2 && allcodesen[i][1] == '='))
 					{
-						code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+						code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 						cs->ck = codeKind::ck_setVariable;
-						vecarr < char *>cbs;
+						vecarr<char *> cbs;
 						cbs.NULLState();
 						cbs.Init(3, true);
 
@@ -1783,9 +1769,9 @@ class InsideCode_Bake
 						// �ڵ������ ����,
 						// �ƴϸ�
 						// �ǳʶٴ� ���̴�.
-						code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+						code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 						cs->ck = codeKind::ck_if;
-						vecarr < char *>cbs;
+						vecarr<char *> cbs;
 						cbs.NULLState();
 						cbs.Init(3, true);
 						int open = 0;
@@ -1810,9 +1796,9 @@ class InsideCode_Bake
 					{
 						if (allcodesen.size() > i + 1 && strcmp(allcodesen[i + 1], "if") == 0)
 						{
-							code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+							code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 							cs->ck = codeKind::ck_if;
-							vecarr < char *>cbs;
+							vecarr<char *> cbs;
 							cbs.NULLState();
 							cbs.Init(3, true);
 
@@ -1838,9 +1824,9 @@ class InsideCode_Bake
 						}
 						else
 						{
-							code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+							code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 							cs->ck = codeKind::ck_if;
-							vecarr < char *>cbs;
+							vecarr<char *> cbs;
 							cbs.NULLState();
 							cbs.Init(3, true);
 							// �׳� else�� ���
@@ -1851,9 +1837,9 @@ class InsideCode_Bake
 					}
 					else if (strcmp(allcodesen[i], "while") == 0)
 					{
-						code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+						code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 						cs->ck = codeKind::ck_while;
-						vecarr < char *>cbs;
+						vecarr<char *> cbs;
 						cbs.NULLState();
 						cbs.Init(3, true);
 						int open = 0;
@@ -1875,9 +1861,9 @@ class InsideCode_Bake
 					}
 					else if (strcmp(allcodesen[i + 1], "(") == 0)
 					{
-						code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+						code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 						cs->ck = codeKind::ck_useFunction;
-						vecarr < char *>cbs;
+						vecarr<char *> cbs;
 						cbs.NULLState();
 						cbs.Init(3, true);
 						int h = 0;
@@ -1893,9 +1879,9 @@ class InsideCode_Bake
 					}
 					else if (strcmp(allcodesen[i], "return") == 0)
 					{
-						code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+						code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 						cs->ck = codeKind::ck_returnInFunction;
-						vecarr < char *>cbs;
+						vecarr<char *> cbs;
 						cbs.NULLState();
 						cbs.Init(3, true);
 						int h = 0;
@@ -1911,9 +1897,9 @@ class InsideCode_Bake
 					}
 					else if (strcmp(allcodesen[i], "break") == 0)
 					{
-						code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+						code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 						cs->ck = codeKind::ck_break;
-						vecarr < char *>cbs;
+						vecarr<char *> cbs;
 						cbs.NULLState();
 						cbs.Init(3, true);
 						cbs.push_back(allcodesen[i]);
@@ -1923,9 +1909,9 @@ class InsideCode_Bake
 					}
 					else if (strcmp(allcodesen[i], "continue") == 0)
 					{
-						code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+						code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 						cs->ck = codeKind::ck_continue;
-						vecarr < char *>cbs;
+						vecarr<char *> cbs;
 						cbs.NULLState();
 						cbs.Init(3, true);
 						cbs.push_back(allcodesen[i]);
@@ -1939,9 +1925,9 @@ class InsideCode_Bake
 				{
 					if (strcmp(allcodesen[i], "struct") == 0)
 					{
-						code_sen *cs = (code_sen *) fm->_New(sizeof(code_sen), true);
+						code_sen *cs = (code_sen *)fm->_New(sizeof(code_sen), true);
 						cs->ck = codeKind::ck_addStruct;
-						vecarr < char *>cbs;
+						vecarr<char *> cbs;
 						cbs.NULLState();
 						cbs.Init(3, true);
 
@@ -1958,7 +1944,7 @@ class InsideCode_Bake
 							cbs.push_back(allcodesen[i + h]);
 						}
 
-						vecarr < char *>bd;
+						vecarr<char *> bd;
 						bd.NULLState();
 						bd.Init(10, false);
 						for (int i = 0; i < cbs.size(); ++i)
@@ -1974,19 +1960,19 @@ class InsideCode_Bake
 						bd.erase(0);
 						bd.pop_back();
 
-						vecarr < code_sen * >*cbv = AddCodeFromBlockData(bd, "none");
+						vecarr<code_sen *> *cbv = AddCodeFromBlockData(bd, "none");
 
-						cs->codeblocks = (vecarr < int *>*)fm->_New(sizeof(vecarr < int *>), true);
+						cs->codeblocks = (vecarr<int *> *)fm->_New(sizeof(vecarr<int *>), true);
 						cs->fm = fm;
-						Init_VPTR < vecarr < int *>*>(cs->codeblocks);
+						Init_VPTR<vecarr<int *> *>(cs->codeblocks);
 
 						for (int u = 0; u < (int)cbv->size(); u++)
 						{
-							cs->codeblocks->push_back(reinterpret_cast < int *>((*cbv)[u]));
+							cs->codeblocks->push_back(reinterpret_cast<int *>((*cbv)[u]));
 						}
 
 						cbv->release();
-						fm->_Delete((byte8 *) cbv, sizeof(cbv));
+						fm->_Delete((byte8 *)cbv, sizeof(cbv));
 
 						set_codesen(cs, cbs, fm);
 						senarr->push_back(cs);
@@ -2050,7 +2036,7 @@ class InsideCode_Bake
 		return -1;
 	}
 
-	type_data *get_type_with_namesen(sen * tname)
+	type_data *get_type_with_namesen(sen *tname)
 	{
 		type_data *td = nullptr;
 		type_data *ntd = nullptr;
@@ -2065,9 +2051,9 @@ class InsideCode_Bake
 		for (int i = 1; i < tname->size(); ++i)
 		{
 			char c = 0;
-			if(tname->at(i).data.str != nullptr)
+			if (tname->at(i).data.str != nullptr)
 			{
-				cout << (int*)tname->at(i).data.str << endl; 
+				cout << (int *)tname->at(i).data.str << endl;
 				c = tname->at(i).data.str[0];
 			}
 			if (c == '*')
@@ -2075,7 +2061,7 @@ class InsideCode_Bake
 				ntd = get_addpointer_type(td);
 				if (i != 1)
 				{
-					fm->_Delete((byte8 *) td, sizeof(td));
+					fm->_Delete((byte8 *)td, sizeof(td));
 				}
 				td = ntd;
 			}
@@ -2149,17 +2135,17 @@ class InsideCode_Bake
 		}
 	}
 
-	temp_mem *get_asm_from_sen(sen * ten, bool is_a, bool isvalue)
+	temp_mem *get_asm_from_sen(sen *ten, bool is_a, bool isvalue)
 	{
 		// fm->dbg_fm1_lifecheck();
-		temp_mem *tm = (temp_mem *) fm->_New(sizeof(temp_mem), true);
+		temp_mem *tm = (temp_mem *)fm->_New(sizeof(temp_mem), true);
 		// fm->dbg_fm1_lifecheck();
 		tm->mem.NULLState();
 		tm->mem.Init(2, false);
 		tm->valuetype_detail = nullptr;
 		if (ten->at(0).type == 'a')
 		{
-			tm = reinterpret_cast < temp_mem * >(ten->at(0).data.str);
+			tm = reinterpret_cast<temp_mem *>(ten->at(0).data.str);
 			return tm;
 		}
 
@@ -2186,10 +2172,10 @@ class InsideCode_Bake
 					tm->mem.push_back(rtm->mem[k]);
 				}
 				tm->mem.push_back(209);
-				tm->mem.push_back((byte8) rtm->valuetype);
+				tm->mem.push_back((byte8)rtm->valuetype);
 
 				inner_params->release();
-				fm->_Delete((byte8 *) inner_params, sizeof(sen));
+				fm->_Delete((byte8 *)inner_params, sizeof(sen));
 				release_tempmem(rtm);
 				return tm;
 			}
@@ -2203,10 +2189,10 @@ class InsideCode_Bake
 					tm->mem.push_back(rtm->mem[k]);
 				}
 				tm->mem.push_back(210);
-				tm->mem.push_back((byte8) rtm->valuetype);
+				tm->mem.push_back((byte8)rtm->valuetype);
 
 				inner_params->release();
-				fm->_Delete((byte8 *) inner_params, sizeof(sen));
+				fm->_Delete((byte8 *)inner_params, sizeof(sen));
 				release_tempmem(rtm);
 				return tm;
 			}
@@ -2233,20 +2219,20 @@ class InsideCode_Bake
 			sen *params_sen = wbss.sen_cut(code, nameloc + 2, loc - 1);
 			if (params_sen->size() == 0)
 			{
-				tm->mem.push_back(189);	// FUNC
-				tm->mem.push_back(200);	// jmp
-				byte8 bb[4] = { };
-				*reinterpret_cast < uint * >(bb) = (uint) (fd->start_pc - &mem[0]);
+				tm->mem.push_back(189); // FUNC
+				tm->mem.push_back(200); // jmp
+				byte8 bb[4] = {};
+				*reinterpret_cast<uint *>(bb) = (uint)(fd->start_pc - &mem[0]);
 				for (int u = 0; u < 4; ++u)
 				{
 					tm->mem.push_back(bb[u]);
 				}
 
 				inner_params->release();
-				fm->_Delete((byte8 *) inner_params, sizeof(sen));
+				fm->_Delete((byte8 *)inner_params, sizeof(sen));
 
 				params_sen->release();
-				fm->_Delete((byte8 *) params_sen, sizeof(sen));
+				fm->_Delete((byte8 *)params_sen, sizeof(sen));
 				tm->memsiz = tm->mem.size();
 				return tm;
 			}
@@ -2273,20 +2259,20 @@ class InsideCode_Bake
 				switch (fd->param_data[paramid].td->typesiz)
 				{
 				case 1:
-					tm->mem.push_back(190);	// param
+					tm->mem.push_back(190); // param
 					break;
 				case 2:
-					tm->mem.push_back(191);	// param
+					tm->mem.push_back(191); // param
 					break;
 				case 4:
-					tm->mem.push_back(192);	// param
+					tm->mem.push_back(192); // param
 					break;
 				}
 
 				++paramid;
 
 				param_sen->release();
-				fm->_Delete((byte8 *) param_sen, sizeof(sen));
+				fm->_Delete((byte8 *)param_sen, sizeof(sen));
 
 				release_tempmem(rtm);
 			}
@@ -2303,36 +2289,36 @@ class InsideCode_Bake
 			switch (fd->param_data[paramid].td->typesiz)
 			{
 			case 1:
-				tm->mem.push_back(190);	// param
+				tm->mem.push_back(190); // param
 				break;
 			case 2:
-				tm->mem.push_back(191);	// param
+				tm->mem.push_back(191); // param
 				break;
 			case 4:
-				tm->mem.push_back(192);	// param
+				tm->mem.push_back(192); // param
 				break;
 			}
 
-			tm->mem.push_back(200);	// jmp
+			tm->mem.push_back(200); // jmp
 			int ll = tm->mem.size();
 			for (int k = 0; k < 4; ++k)
 			{
 				tm->mem.push_back(0);
 			}
-			*reinterpret_cast < uint * >(&tm->mem[ll]) = (uint) (fd->start_pc - &mem[0]);
+			*reinterpret_cast<uint *>(&tm->mem[ll]) = (uint)(fd->start_pc - &mem[0]);
 
 			tm->memsiz = tm->mem.size();
 			tm->valuetype = get_int_with_basictype(fd->returntype);
 			tm->valuetype_detail = fd->returntype;
 
 			inner_params->release();
-			fm->_Delete((byte8 *) inner_params, sizeof(sen));
+			fm->_Delete((byte8 *)inner_params, sizeof(sen));
 
 			params_sen->release();
-			fm->_Delete((byte8 *) params_sen, sizeof(sen));
+			fm->_Delete((byte8 *)params_sen, sizeof(sen));
 
 			param_sen->release();
-			fm->_Delete((byte8 *) param_sen, sizeof(sen));
+			fm->_Delete((byte8 *)param_sen, sizeof(sen));
 
 			release_tempmem(rtm);
 
@@ -2350,7 +2336,7 @@ class InsideCode_Bake
 				{
 					tm->mem.push_back(18);
 					byte8 add[4];
-					*reinterpret_cast < uint * >(&add[0]) = gvarid;
+					*reinterpret_cast<uint *>(&add[0]) = gvarid;
 					for (int i = 0; i < 4; ++i)
 					{
 						tm->mem.push_back(add[i]);
@@ -2360,7 +2346,7 @@ class InsideCode_Bake
 				{
 					tm->mem.push_back(27);
 					byte8 add[4];
-					*reinterpret_cast < uint * >(&add[0]) = gvarid;
+					*reinterpret_cast<uint *>(&add[0]) = gvarid;
 					for (int i = 0; i < 4; ++i)
 					{
 						tm->mem.push_back(add[i]);
@@ -2401,7 +2387,7 @@ class InsideCode_Bake
 				{
 					tm->mem.push_back(195);
 					byte8 add[4];
-					*reinterpret_cast < uint * >(&add[0]) = varid;
+					*reinterpret_cast<uint *>(&add[0]) = varid;
 					for (int i = 0; i < 4; ++i)
 					{
 						tm->mem.push_back(add[i]);
@@ -2411,7 +2397,7 @@ class InsideCode_Bake
 				{
 					tm->mem.push_back(196);
 					byte8 add[4];
-					*reinterpret_cast < uint * >(&add[0]) = varid;
+					*reinterpret_cast<uint *>(&add[0]) = varid;
 					for (int i = 0; i < 4; ++i)
 					{
 						tm->mem.push_back(add[i]);
@@ -2440,7 +2426,6 @@ class InsideCode_Bake
 					tm->valuetype_detail = get_addpointer_type(td);
 					return tm;
 				}
-
 			}
 			else
 			{
@@ -2453,143 +2438,143 @@ class InsideCode_Bake
 				switch (t)
 				{
 				case TBT::_value_bool:
+				{
+					bool b = true;
+					if (is_a)
 					{
-						bool b = true;
-						if (is_a)
-						{
-							tm->mem.push_back(18);
-						}
-						else
-						{
-							tm->mem.push_back(27);
-						}
-						if (strcmp(str.c_str(), "true") == 0)
-							b = true;
-						else
-							b = false;
-						for (int k = 0; k < 4; ++k)
-						{
-							tm->mem.push_back(0);
-						}
-						*reinterpret_cast < bool * >(&tm->mem[1]) = b;
-						tm->memsiz = 5;
-						tm->valuetype = 7;
+						tm->mem.push_back(18);
 					}
-					break;
-				case TBT::_value_integer:
+					else
 					{
-						int a = 0;
-						if (is_a)
-						{
-							tm->mem.push_back(18);
-						}
-						else
-						{
-							tm->mem.push_back(27);
-						}
-						a = atoi(str.c_str());
-						for (int k = 0; k < 4; ++k)
-						{
-							tm->mem.push_back(0);
-						}
-						*reinterpret_cast < int *>(&tm->mem[1]) = a;
-						tm->memsiz = 5;
-						tm->valuetype = 4;
+						tm->mem.push_back(27);
 					}
-					break;
-				case TBT::_value_float:
+					if (strcmp(str.c_str(), "true") == 0)
+						b = true;
+					else
+						b = false;
+					for (int k = 0; k < 4; ++k)
 					{
-						float a = 0;
-						if (is_a)
-						{
-							tm->mem.push_back(18);
-						}
-						else
-						{
-							tm->mem.push_back(27);
-						}
-						a = stof(str.c_str());
-						for (int k = 0; k < 4; ++k)
-						{
-							tm->mem.push_back(0);
-						}
-						*reinterpret_cast < float *>(&tm->mem[1]) = a;
-						tm->memsiz = 5;
-						tm->valuetype = 6;
-					}
-					break;
-				case TBT::_value_char:
-					{
-						if (is_a)
-						{
-							tm->mem.push_back(16);
-						}
-						else
-						{
-							tm->mem.push_back(25);
-						}
-						if (str[1] != '\\')
-						{
-							tm->mem.push_back(str[1]);
-						}
-						else
-						{
-							switch (str[2])
-							{
-							case 'n':
-								tm->mem.push_back('\n');
-								break;
-							case '0':
-								tm->mem.push_back(0);
-								break;
-							case 't':
-								tm->mem.push_back('\t');
-								break;
-							case '\\':
-								tm->mem.push_back('\\');
-								break;
-							case '\'':
-								tm->mem.push_back('\'');
-								break;
-							case '\"':
-								tm->mem.push_back('\"');
-								break;
-							default:
-								tm->mem.push_back(0);
-								break;
-							}
-						}
-
-						tm->memsiz = 2;
-						tm->valuetype = 0;
-					}
-					break;
-				case TBT::_value_str:
-					{
-						if (is_a)
-						{
-							tm->mem.push_back(214);
-						}
-						else
-						{
-							tm->mem.push_back(215);
-						}
-						int max = strlen(str.c_str()) - 1;
-						char cc[4] = { };
-						*reinterpret_cast < uint * >(cc) = max;
-						for (int k = 0; k < 4; ++k)
-						{
-							tm->mem.push_back(cc[k]);
-						}
-						for (int k = 1; k < max; ++k)
-						{
-							tm->mem.push_back(str[k]);
-						}
 						tm->mem.push_back(0);
-						tm->memsiz = tm->mem.size();
-						tm->valuetype = 8;
 					}
-					break;
+					*reinterpret_cast<bool *>(&tm->mem[1]) = b;
+					tm->memsiz = 5;
+					tm->valuetype = 7;
+				}
+				break;
+				case TBT::_value_integer:
+				{
+					int a = 0;
+					if (is_a)
+					{
+						tm->mem.push_back(18);
+					}
+					else
+					{
+						tm->mem.push_back(27);
+					}
+					a = atoi(str.c_str());
+					for (int k = 0; k < 4; ++k)
+					{
+						tm->mem.push_back(0);
+					}
+					*reinterpret_cast<int *>(&tm->mem[1]) = a;
+					tm->memsiz = 5;
+					tm->valuetype = 4;
+				}
+				break;
+				case TBT::_value_float:
+				{
+					float a = 0;
+					if (is_a)
+					{
+						tm->mem.push_back(18);
+					}
+					else
+					{
+						tm->mem.push_back(27);
+					}
+					a = stof(str.c_str());
+					for (int k = 0; k < 4; ++k)
+					{
+						tm->mem.push_back(0);
+					}
+					*reinterpret_cast<float *>(&tm->mem[1]) = a;
+					tm->memsiz = 5;
+					tm->valuetype = 6;
+				}
+				break;
+				case TBT::_value_char:
+				{
+					if (is_a)
+					{
+						tm->mem.push_back(16);
+					}
+					else
+					{
+						tm->mem.push_back(25);
+					}
+					if (str[1] != '\\')
+					{
+						tm->mem.push_back(str[1]);
+					}
+					else
+					{
+						switch (str[2])
+						{
+						case 'n':
+							tm->mem.push_back('\n');
+							break;
+						case '0':
+							tm->mem.push_back(0);
+							break;
+						case 't':
+							tm->mem.push_back('\t');
+							break;
+						case '\\':
+							tm->mem.push_back('\\');
+							break;
+						case '\'':
+							tm->mem.push_back('\'');
+							break;
+						case '\"':
+							tm->mem.push_back('\"');
+							break;
+						default:
+							tm->mem.push_back(0);
+							break;
+						}
+					}
+
+					tm->memsiz = 2;
+					tm->valuetype = 0;
+				}
+				break;
+				case TBT::_value_str:
+				{
+					if (is_a)
+					{
+						tm->mem.push_back(214);
+					}
+					else
+					{
+						tm->mem.push_back(215);
+					}
+					int max = strlen(str.c_str()) - 1;
+					char cc[4] = {};
+					*reinterpret_cast<uint *>(cc) = max;
+					for (int k = 0; k < 4; ++k)
+					{
+						tm->mem.push_back(cc[k]);
+					}
+					for (int k = 1; k < max; ++k)
+					{
+						tm->mem.push_back(str[k]);
+					}
+					tm->mem.push_back(0);
+					tm->memsiz = tm->mem.size();
+					tm->valuetype = 8;
+				}
+				break;
 				}
 				tm->valuetype_detail = get_basic_type_with_int(tm->valuetype);
 				str.islocal = true;
@@ -2598,10 +2583,10 @@ class InsideCode_Bake
 		}
 
 		// seperate term and operator of expr
-		vecarr < sen * >segs;	// term
+		vecarr<sen *> segs; // term
 		segs.NULLState();
 		segs.Init(2, false);
-		sen *vtemp = (sen *) fm->_New(sizeof(sen), true);
+		sen *vtemp = (sen *)fm->_New(sizeof(sen), true);
 		vtemp->NULLState();
 		vtemp->Init(2, false);
 
@@ -2621,7 +2606,7 @@ class InsideCode_Bake
 				{
 					segs.push_back(vtemp);
 
-					vtemp = (sen *) fm->_New(sizeof(sen), true);
+					vtemp = (sen *)fm->_New(sizeof(sen), true);
 					vtemp->NULLState();
 					vtemp->Init(2, true);
 				}
@@ -2629,7 +2614,7 @@ class InsideCode_Bake
 				vtemp->push_back(ten->at(i));
 				segs.push_back(vtemp);
 
-				vtemp = (sen *) fm->_New(sizeof(sen), true);
+				vtemp = (sen *)fm->_New(sizeof(sen), true);
 				vtemp->NULLState();
 				vtemp->Init(2, true);
 
@@ -2641,8 +2626,7 @@ class InsideCode_Bake
 
 				i += temp->size();
 			}
-			else if ((('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z'))
-					 || (c == '_' || ('0' <= c && c <= '9')))
+			else if ((('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z')) || (c == '_' || ('0' <= c && c <= '9')))
 			{
 				vtemp->push_back(ten->at(i));
 			}
@@ -2652,7 +2636,7 @@ class InsideCode_Bake
 				{
 					segs.push_back(vtemp);
 
-					vtemp = (sen *) fm->_New(sizeof(sen), true);
+					vtemp = (sen *)fm->_New(sizeof(sen), true);
 					vtemp->NULLState();
 					vtemp->Init(2, true);
 				}
@@ -2661,7 +2645,7 @@ class InsideCode_Bake
 				vtemp->at(0).type = 'o';
 				segs.push_back(vtemp);
 
-				vtemp = (sen *) fm->_New(sizeof(sen), true);
+				vtemp = (sen *)fm->_New(sizeof(sen), true);
 				vtemp->NULLState();
 				vtemp->Init(2, false);
 			}
@@ -2674,10 +2658,10 @@ class InsideCode_Bake
 		else
 		{
 			vtemp->release();
-			fm->_Delete((byte8 *) vtemp, sizeof(sen));
+			fm->_Delete((byte8 *)vtemp, sizeof(sen));
 		}
 
-		/* 
+		/*
 		   for(int k=0;k<segs.size();++k){ wbss.dbg_sen(segs.at(k)); } */
 
 		for (int k = 0; k < basicoper_max; ++k)
@@ -2704,7 +2688,7 @@ class InsideCode_Bake
 							{
 								// input num oper
 								temp_mem *result_ten =
-									(temp_mem *) fm->_New(sizeof(temp_mem), true);
+									(temp_mem *)fm->_New(sizeof(temp_mem), true);
 								temp_mem *left_ten = nullptr;
 								temp_mem *right_ten = nullptr;
 								left_ten = get_asm_from_sen(segs.at(i - 1), true, true);
@@ -2721,7 +2705,6 @@ class InsideCode_Bake
 								if (rightcast != (int)casting_type::nocasting)
 									++add;
 
-
 								result_ten->mem.NULLState();
 								result_ten->mem.Init(result_ten->memsiz + 1, false);
 								for (int u = 0; u < left_ten->memsiz; ++u)
@@ -2731,8 +2714,8 @@ class InsideCode_Bake
 								// a casting
 								if (leftcast != (int)casting_type::nocasting)
 								{
-									result_ten->mem.push_back((byte8) 201);
-									result_ten->mem.push_back((byte8) leftcast);
+									result_ten->mem.push_back((byte8)201);
+									result_ten->mem.push_back((byte8)leftcast);
 								}
 								for (int u = 0; u < right_ten->memsiz; ++u)
 								{
@@ -2741,8 +2724,8 @@ class InsideCode_Bake
 								// b casting
 								if (rightcast != (int)casting_type::nocasting)
 								{
-									result_ten->mem.push_back((byte8) 202);
-									result_ten->mem.push_back((byte8) rightcast);
+									result_ten->mem.push_back((byte8)202);
+									result_ten->mem.push_back((byte8)rightcast);
 								}
 
 								result_ten->mem.push_back(52);
@@ -2751,12 +2734,12 @@ class InsideCode_Bake
 								if (is_a)
 								{
 									int opp = basicoper[k].startop + 2 * opertype;
-									result_ten->mem.push_back((byte8) opp);
+									result_ten->mem.push_back((byte8)opp);
 								}
 								else
 								{
 									int opp = basicoper[k].startop + 2 * opertype + 1;
-									result_ten->mem.push_back((byte8) opp);
+									result_ten->mem.push_back((byte8)opp);
 								}
 								result_ten->memsiz = result_ten->mem.size();
 
@@ -2766,14 +2749,14 @@ class InsideCode_Bake
 								}
 								else
 								{
-									result_ten->valuetype = 7;	// bool
+									result_ten->valuetype = 7; // bool
 								}
 								result_ten->valuetype_detail =
 									get_basic_type_with_int(result_ten->valuetype);
 
 								segs.erase(i + 1);
-								segs[i]->at(0).type = 'a';	// asm
-								segs[i]->at(0).data.str = reinterpret_cast < char *>(result_ten);
+								segs[i]->at(0).type = 'a'; // asm
+								segs[i]->at(0).data.str = reinterpret_cast<char *>(result_ten);
 								segs.erase(i - 1);
 								--i;
 							}
@@ -2784,7 +2767,7 @@ class InsideCode_Bake
 								{
 									// ! not
 									temp_mem *result_ten =
-										(temp_mem *) fm->_New(sizeof(temp_mem), true);
+										(temp_mem *)fm->_New(sizeof(temp_mem), true);
 									temp_mem *right_ten = nullptr;
 									right_ten = get_asm_from_sen(segs.at(i + 1), false, true);
 									int add = 1;
@@ -2802,30 +2785,29 @@ class InsideCode_Bake
 									if (is_a)
 									{
 										int opp = basicoper[k].startop;
-										result_ten->mem.push_back((byte8) opp);
+										result_ten->mem.push_back((byte8)opp);
 									}
 									else
 									{
 										int opp = basicoper[k].startop + 1;
-										result_ten->mem.push_back((byte8) opp);
+										result_ten->mem.push_back((byte8)opp);
 									}
 									result_ten->memsiz = result_ten->mem.size();
 
-
-									result_ten->valuetype = 7;	// bool
+									result_ten->valuetype = 7; // bool
 									result_ten->valuetype_detail =
 										get_basic_type_with_int(result_ten->valuetype);
 
 									segs.erase(i + 1);
-									segs[i]->at(0).type = 'a';	// asm
+									segs[i]->at(0).type = 'a'; // asm
 									segs[i]->at(0).data.str =
-										reinterpret_cast < char *>(result_ten);
+										reinterpret_cast<char *>(result_ten);
 								}
 								else
 								{
 									// && and ||
 									temp_mem *result_ten =
-										(temp_mem *) fm->_New(sizeof(temp_mem), true);
+										(temp_mem *)fm->_New(sizeof(temp_mem), true);
 									temp_mem *left_ten = nullptr;
 									temp_mem *right_ten = nullptr;
 									left_ten = get_asm_from_sen(segs.at(i - 1), true, true);
@@ -2848,25 +2830,25 @@ class InsideCode_Bake
 									if (is_a)
 									{
 										int opp = basicoper[k].startop;
-										result_ten->mem.push_back((byte8) opp);
+										result_ten->mem.push_back((byte8)opp);
 									}
 									else
 									{
 										int opp = basicoper[k].startop + 1;
-										result_ten->mem.push_back((byte8) opp);
+										result_ten->mem.push_back((byte8)opp);
 									}
-									
+
 									result_ten->memsiz = result_ten->mem.size();
 
-									result_ten->valuetype = 7;	// bool
+									result_ten->valuetype = 7; // bool
 									result_ten->valuetype_detail =
 										get_basic_type_with_int(result_ten->valuetype);
 
 									segs.erase(i + 1);
 
-									segs[i]->at(0).type = 'a';	// asm
+									segs[i]->at(0).type = 'a'; // asm
 									segs[i]->at(0).data.str =
-										reinterpret_cast < char *>(result_ten);
+										reinterpret_cast<char *>(result_ten);
 									segs.erase(i - 1);
 									--i;
 								}
@@ -2878,350 +2860,347 @@ class InsideCode_Bake
 							switch (basicoper[k].symbol[0])
 							{
 							case '[':
+							{
+								temp_mem *result_ten =
+									(temp_mem *)fm->_New(sizeof(temp_mem), true);
+								temp_mem *left_ten = nullptr;
+								temp_mem *right_ten = nullptr;
+								left_ten = get_asm_from_sen(segs.at(i - 1), true, false);
+								right_ten = get_asm_from_sen(segs.at(i + 1), true, true);
+
+								result_ten->memsiz = left_ten->memsiz + right_ten->memsiz + 9;
+								result_ten->mem.NULLState();
+								result_ten->mem.Init(result_ten->memsiz + 1, false);
+
+								for (int u = 0; u < right_ten->memsiz; ++u)
 								{
-									temp_mem *result_ten =
-										(temp_mem *) fm->_New(sizeof(temp_mem), true);
-									temp_mem *left_ten = nullptr;
-									temp_mem *right_ten = nullptr;
-									left_ten = get_asm_from_sen(segs.at(i - 1), true, false);
-									right_ten = get_asm_from_sen(segs.at(i + 1), true, true);
+									result_ten->mem.push_back(right_ten->mem[u]);
+								}
 
-									result_ten->memsiz = left_ten->memsiz + right_ten->memsiz + 9;
-									result_ten->mem.NULLState();
-									result_ten->mem.Init(result_ten->memsiz + 1, false);
+								type_data *td = get_sub_type(left_ten->valuetype_detail);
+								type_data *std = get_sub_type(td);
+								result_ten->mem.push_back(27); // b=const4
+								char cc[4] = {};
+								*reinterpret_cast<uint *>(cc) = std->typesiz;
+								for (int u = 0; u < 4; ++u)
+									result_ten->mem.push_back(cc[u]);
 
-									for (int u = 0; u < right_ten->memsiz; ++u)
-									{
-										result_ten->mem.push_back(right_ten->mem[u]);
-									}
+								result_ten->mem.push_back(52);	// axby
+								result_ten->mem.push_back(218); // POP
+								// b=x*y uint
+								result_ten->mem.push_back(92);
 
-									type_data *td = get_sub_type(left_ten->valuetype_detail);
-									type_data *std = get_sub_type(td);
-									result_ten->mem.push_back(27);	// b=const4
-									char cc[4] = { };
-									*reinterpret_cast < uint * >(cc) = std->typesiz;
-									for (int u = 0; u < 4; ++u)
-										result_ten->mem.push_back(cc[u]);
+								for (int u = 0; u < left_ten->memsiz; ++u)
+								{
+									result_ten->mem.push_back(left_ten->mem[u]);
+								}
 
-									result_ten->mem.push_back(52);	// axby
-									result_ten->mem.push_back(218); // POP
-									// b=x*y uint
-									result_ten->mem.push_back(92);
+								result_ten->mem.push_back(52);	// axby
+								result_ten->mem.push_back(218); // POP
 
-									for (int u = 0; u < left_ten->memsiz; ++u)
-									{
-										result_ten->mem.push_back(left_ten->mem[u]);
-									}
-
-									result_ten->mem.push_back(52);	// axby
-									result_ten->mem.push_back(218); // POP
-
-									if (is_a)
-									{
-										int opp = 63;
-										result_ten->mem.push_back((byte8) opp);
-										result_ten->memsiz = result_ten->mem.size();
-										if (isvalue)
-										{
-											result_ten->valuetype = get_int_with_basictype(std);
-											if (result_ten->valuetype == 8)
-											{
-												result_ten->valuetype_detail =
-													get_addpointer_type(std);
-											}
-											else
-											{
-												result_ten->valuetype_detail = std;
-											}
-										}
-										else
-										{
-											result_ten->valuetype = 8;
-											result_ten->valuetype_detail =
-												get_addpointer_type(std);
-										}
-
-									}
-									else
-									{
-										int opp = 64;
-										result_ten->mem.push_back((byte8) opp);
-										result_ten->memsiz = result_ten->mem.size();
-										if (isvalue)
-										{
-											result_ten->valuetype = get_int_with_basictype(std);
-											if (result_ten->valuetype == 8)
-											{
-												result_ten->valuetype_detail =
-													get_addpointer_type(std);
-											}
-											else
-											{
-												result_ten->valuetype_detail = std;
-											}
-										}
-										else
-										{
-											result_ten->valuetype = 8;
-											result_ten->valuetype_detail =
-												get_addpointer_type(std);
-										}
-									}
-
-									segs.erase(i + 1);
-									segs.erase(i + 1);
-
-									segs[i]->at(0).type = 'a';	// asm
-									segs[i]->at(0).data.str =
-										reinterpret_cast < char *>(result_ten);
-									segs.erase(i - 1);
-									--i;
+								if (is_a)
+								{
+									int opp = 63;
+									result_ten->mem.push_back((byte8)opp);
 									result_ten->memsiz = result_ten->mem.size();
+									if (isvalue)
+									{
+										result_ten->valuetype = get_int_with_basictype(std);
+										if (result_ten->valuetype == 8)
+										{
+											result_ten->valuetype_detail =
+												get_addpointer_type(std);
+										}
+										else
+										{
+											result_ten->valuetype_detail = std;
+										}
+									}
+									else
+									{
+										result_ten->valuetype = 8;
+										result_ten->valuetype_detail =
+											get_addpointer_type(std);
+									}
 								}
-								break;
+								else
+								{
+									int opp = 64;
+									result_ten->mem.push_back((byte8)opp);
+									result_ten->memsiz = result_ten->mem.size();
+									if (isvalue)
+									{
+										result_ten->valuetype = get_int_with_basictype(std);
+										if (result_ten->valuetype == 8)
+										{
+											result_ten->valuetype_detail =
+												get_addpointer_type(std);
+										}
+										else
+										{
+											result_ten->valuetype_detail = std;
+										}
+									}
+									else
+									{
+										result_ten->valuetype = 8;
+										result_ten->valuetype_detail =
+											get_addpointer_type(std);
+									}
+								}
+
+								segs.erase(i + 1);
+								segs.erase(i + 1);
+
+								segs[i]->at(0).type = 'a'; // asm
+								segs[i]->at(0).data.str =
+									reinterpret_cast<char *>(result_ten);
+								segs.erase(i - 1);
+								--i;
+								result_ten->memsiz = result_ten->mem.size();
+							}
+							break;
 							case '.':
+							{
+								temp_mem *result_ten =
+									(temp_mem *)fm->_New(sizeof(temp_mem), true);
+
+								temp_mem *left_ten = nullptr;
+								left_ten = get_asm_from_sen(segs.at(i - 1), true, false);
+								type_data *td;
+								if (segs.at(i + 1)->size() == 1 && segs.at(i + 1)->at(0).type == 'w')
 								{
-									temp_mem *result_ten =
-										(temp_mem *) fm->_New(sizeof(temp_mem), true);
+									td = get_type_with_vname(segs.at(i + 1)->at(0).data.str);
+									// a.b
+									uint bid = 0;
+									bool perfect = false;
+									type_data *returntype = nullptr;
 
-									temp_mem *left_ten = nullptr;
-									left_ten = get_asm_from_sen(segs.at(i - 1), true, false);
-									type_data *td;
-									if (segs.at(i + 1)->size() == 1
-										&& segs.at(i + 1)->at(0).type == 'w')
-									{
-										td = get_type_with_vname(segs.at(i + 1)->at(0).data.str);
-										// a.b
-										uint bid = 0;
-										bool perfect = false;
-										type_data *returntype = nullptr;
-
-										if (td == nullptr)
-											break;
-										if (td->typetype != 's')
-											break;
-										struct_data *sptr =
-											reinterpret_cast < struct_data * >(td->structptr);
-										int su = 0;
-										for (int u = 0; u < sptr->member_data.size(); ++u)
-										{
-											if (sptr->member_data[u].name ==
-												segs.at(i + 1)->at(0).data.str)
-											{
-												bid = sptr->member_data[u].add_address;
-												su = u;
-												returntype = sptr->member_data[u].td;
-												perfect = true;
-												break;
-											}
-										}
-
-										if (perfect)
-										{
-											result_ten->memsiz = left_ten->memsiz + 7;
-											result_ten->mem.NULLState();
-											result_ten->mem.Init(2, false);
-											for (int u = 0; u < left_ten->memsiz; ++u)
-											{
-												result_ten->mem.push_back(left_ten->mem[u]);
-											}
-											// axby
-											result_ten->mem.push_back(52);
-											result_ten->mem.push_back(218); // POP
-											// set y const4
-											result_ten->mem.push_back(45);
-
-											char cc[4] = { };
-											*reinterpret_cast < uint * >(cc) = bid;
-											for (int u = 0; u < 4; ++u)
-												result_ten->mem.push_back(cc[u]);
-
-											if (is_a)
-											{
-												// a=x+y uint
-												result_ten->mem.push_back(63);
-											}
-											else
-											{
-												// b=x+y uint
-												result_ten->mem.push_back(64);
-											}
-
-											// ptr
-											result_ten->valuetype = 8;
-											result_ten->valuetype_detail =
-												sptr->member_data[su].td;
-
-											segs.erase(i + 1);
-											segs[i]->at(0).type = 'a';	// asm
-											segs[i]->at(0).data.str =
-												reinterpret_cast < char *>(result_ten);
-											segs.erase(i - 1);
-											--i;
-										}
-									}
-								}
-								break;
-							case '-':
-								{
-									temp_mem *result_ten =
-										(temp_mem *) fm->_New(sizeof(temp_mem), true);
-									temp_mem *left_ten = nullptr;
-									left_ten = get_asm_from_sen(segs.at(i - 1), true, false);
-									type_data *td;
-									if (segs.at(i + 1)->size() == 1
-										&& segs.at(i + 1)->at(0).type == 'w')
-									{
-										td = get_type_with_vname(segs.at(i + 1)->at(0).data.str);
-										// a.b
-										uint bid = 0;
-										bool perfect = false;
-										type_data *returntype = nullptr;
-
-										if (td == nullptr)
-											break;
-										if (td->typetype != 's')
-											break;
-										struct_data *sptr =
-											reinterpret_cast < struct_data * >(td->structptr);
-										int su = 0;
-										for (int u = 0; u < sptr->member_data.size(); ++u)
-										{
-											if (sptr->member_data[u].name ==
-												segs.at(i + 1)->at(0).data.str)
-											{
-												bid = sptr->member_data[u].add_address;
-												su = u;
-												returntype = sptr->member_data[u].td;
-												perfect = true;
-												break;
-											}
-										}
-
-										if (perfect)
-										{
-											result_ten->memsiz = left_ten->memsiz + 8;
-											result_ten->mem.NULLState();
-											result_ten->mem.Init(2, false);
-											for (int u = 0; u < left_ten->memsiz; ++u)
-											{
-												result_ten->mem.push_back(left_ten->mem[u]);
-											}
-											// a=value(a)
-											result_ten->mem.push_back(205);
-											// axby
-											result_ten->mem.push_back(52);
-											result_ten->mem.push_back(218); // POP
-											// set y const4
-											result_ten->mem.push_back(45);
-
-											char cc[4] = { };
-											*reinterpret_cast < uint * >(cc) = bid;
-											for (int u = 0; u < 4; ++u)
-												result_ten->mem.push_back(cc[u]);
-
-											if (is_a)
-											{
-												// a=x+y uint
-												result_ten->mem.push_back(63);
-											}
-											else
-											{
-												// b=x+y uint
-												result_ten->mem.push_back(64);
-											}
-
-											// ptr
-											result_ten->valuetype = 8;
-											result_ten->valuetype_detail =
-												sptr->member_data[su].td;
-
-											segs.erase(i + 1);
-
-											segs[i]->at(0).type = 'a';	// asm
-											segs[i]->at(0).data.str =
-												reinterpret_cast < char *>(result_ten);
-											segs.erase(i - 1);
-
-											--i;
-										}
-									}
-								}
-								break;
-							case '&':
-								{
-									temp_mem *result_ten =
-										(temp_mem *) fm->_New(sizeof(temp_mem), true);
-									temp_mem *right_ten = nullptr;
-									if (is_a)
-									{
-										right_ten = get_asm_from_sen(segs.at(i + 1), true, false);
-									}
-									else
-									{
-										right_ten = get_asm_from_sen(segs.at(i + 1), false, false);
-									}
-
-									result_ten->mem.NULLState();
-									result_ten->mem.Init(2, false);
-									result_ten->memsiz = right_ten->memsiz;
-									for (int u = 0; u < right_ten->memsiz; ++u)
-									{
-										result_ten->mem.push_back(right_ten->mem[u]);
-									}
-
-									// ptr
-									result_ten->valuetype = 8;
-									result_ten->valuetype_detail = right_ten->valuetype_detail;
-									segs.erase(i + 1);
-									segs[i]->at(0).type = 'a';	// asm
-									segs[i]->at(0).data.str =
-										reinterpret_cast < char *>(result_ten);
-								}
-								break;
-							case '*':
-								{
-									if (segs.at(i - 1)->at(0).type != 'o')
+									if (td == nullptr)
 										break;
-									temp_mem *result_ten =
-										(temp_mem *) fm->_New(sizeof(temp_mem), true);
-									temp_mem *right_ten =
-										(temp_mem *) fm->_New(sizeof(temp_mem), true);
-									type_data *td = get_sub_type(right_ten->valuetype_detail);
-
-									if (is_a)
+									if (td->typetype != 's')
+										break;
+									struct_data *sptr =
+										reinterpret_cast<struct_data *>(td->structptr);
+									int su = 0;
+									for (int u = 0; u < sptr->member_data.size(); ++u)
 									{
-										right_ten = get_asm_from_sen(segs.at(i + 1), true, true);
-									}
-									else
-									{
-										right_ten = get_asm_from_sen(segs.at(i + 1), false, true);
-									}
-									result_ten->memsiz = right_ten->memsiz + 1;
-									result_ten->mem.NULLState();
-									result_ten->mem.Init(2, false);
-									for (int u = 0; u < right_ten->memsiz; ++u)
-									{
-										result_ten->mem.push_back(right_ten->mem[u]);
-									}
-									if (is_a)
-									{
-										result_ten->mem.push_back(205);
-									}
-									else
-									{
-										result_ten->mem.push_back(206);
+										if (sptr->member_data[u].name ==
+											segs.at(i + 1)->at(0).data.str)
+										{
+											bid = sptr->member_data[u].add_address;
+											su = u;
+											returntype = sptr->member_data[u].td;
+											perfect = true;
+											break;
+										}
 									}
 
-									// ptr
-									result_ten->valuetype = 8;
-									result_ten->valuetype_detail = td;
-									segs.erase(i + 1);
-									segs[i]->at(0).type = 'a';	// asm
-									segs[i]->at(0).data.str =
-										reinterpret_cast < char *>(result_ten);
+									if (perfect)
+									{
+										result_ten->memsiz = left_ten->memsiz + 7;
+										result_ten->mem.NULLState();
+										result_ten->mem.Init(2, false);
+										for (int u = 0; u < left_ten->memsiz; ++u)
+										{
+											result_ten->mem.push_back(left_ten->mem[u]);
+										}
+										// axby
+										result_ten->mem.push_back(52);
+										result_ten->mem.push_back(218); // POP
+										// set y const4
+										result_ten->mem.push_back(45);
+
+										char cc[4] = {};
+										*reinterpret_cast<uint *>(cc) = bid;
+										for (int u = 0; u < 4; ++u)
+											result_ten->mem.push_back(cc[u]);
+
+										if (is_a)
+										{
+											// a=x+y uint
+											result_ten->mem.push_back(63);
+										}
+										else
+										{
+											// b=x+y uint
+											result_ten->mem.push_back(64);
+										}
+
+										// ptr
+										result_ten->valuetype = 8;
+										result_ten->valuetype_detail =
+											sptr->member_data[su].td;
+
+										segs.erase(i + 1);
+										segs[i]->at(0).type = 'a'; // asm
+										segs[i]->at(0).data.str =
+											reinterpret_cast<char *>(result_ten);
+										segs.erase(i - 1);
+										--i;
+									}
 								}
-								break;
+							}
+							break;
+							case '-':
+							{
+								temp_mem *result_ten =
+									(temp_mem *)fm->_New(sizeof(temp_mem), true);
+								temp_mem *left_ten = nullptr;
+								left_ten = get_asm_from_sen(segs.at(i - 1), true, false);
+								type_data *td;
+								if (segs.at(i + 1)->size() == 1 && segs.at(i + 1)->at(0).type == 'w')
+								{
+									td = get_type_with_vname(segs.at(i + 1)->at(0).data.str);
+									// a.b
+									uint bid = 0;
+									bool perfect = false;
+									type_data *returntype = nullptr;
+
+									if (td == nullptr)
+										break;
+									if (td->typetype != 's')
+										break;
+									struct_data *sptr =
+										reinterpret_cast<struct_data *>(td->structptr);
+									int su = 0;
+									for (int u = 0; u < sptr->member_data.size(); ++u)
+									{
+										if (sptr->member_data[u].name ==
+											segs.at(i + 1)->at(0).data.str)
+										{
+											bid = sptr->member_data[u].add_address;
+											su = u;
+											returntype = sptr->member_data[u].td;
+											perfect = true;
+											break;
+										}
+									}
+
+									if (perfect)
+									{
+										result_ten->memsiz = left_ten->memsiz + 8;
+										result_ten->mem.NULLState();
+										result_ten->mem.Init(2, false);
+										for (int u = 0; u < left_ten->memsiz; ++u)
+										{
+											result_ten->mem.push_back(left_ten->mem[u]);
+										}
+										// a=value(a)
+										result_ten->mem.push_back(205);
+										// axby
+										result_ten->mem.push_back(52);
+										result_ten->mem.push_back(218); // POP
+										// set y const4
+										result_ten->mem.push_back(45);
+
+										char cc[4] = {};
+										*reinterpret_cast<uint *>(cc) = bid;
+										for (int u = 0; u < 4; ++u)
+											result_ten->mem.push_back(cc[u]);
+
+										if (is_a)
+										{
+											// a=x+y uint
+											result_ten->mem.push_back(63);
+										}
+										else
+										{
+											// b=x+y uint
+											result_ten->mem.push_back(64);
+										}
+
+										// ptr
+										result_ten->valuetype = 8;
+										result_ten->valuetype_detail =
+											sptr->member_data[su].td;
+
+										segs.erase(i + 1);
+
+										segs[i]->at(0).type = 'a'; // asm
+										segs[i]->at(0).data.str =
+											reinterpret_cast<char *>(result_ten);
+										segs.erase(i - 1);
+
+										--i;
+									}
+								}
+							}
+							break;
+							case '&':
+							{
+								temp_mem *result_ten =
+									(temp_mem *)fm->_New(sizeof(temp_mem), true);
+								temp_mem *right_ten = nullptr;
+								if (is_a)
+								{
+									right_ten = get_asm_from_sen(segs.at(i + 1), true, false);
+								}
+								else
+								{
+									right_ten = get_asm_from_sen(segs.at(i + 1), false, false);
+								}
+
+								result_ten->mem.NULLState();
+								result_ten->mem.Init(2, false);
+								result_ten->memsiz = right_ten->memsiz;
+								for (int u = 0; u < right_ten->memsiz; ++u)
+								{
+									result_ten->mem.push_back(right_ten->mem[u]);
+								}
+
+								// ptr
+								result_ten->valuetype = 8;
+								result_ten->valuetype_detail = right_ten->valuetype_detail;
+								segs.erase(i + 1);
+								segs[i]->at(0).type = 'a'; // asm
+								segs[i]->at(0).data.str =
+									reinterpret_cast<char *>(result_ten);
+							}
+							break;
+							case '*':
+							{
+								if (segs.at(i - 1)->at(0).type != 'o')
+									break;
+								temp_mem *result_ten =
+									(temp_mem *)fm->_New(sizeof(temp_mem), true);
+								temp_mem *right_ten =
+									(temp_mem *)fm->_New(sizeof(temp_mem), true);
+								type_data *td = get_sub_type(right_ten->valuetype_detail);
+
+								if (is_a)
+								{
+									right_ten = get_asm_from_sen(segs.at(i + 1), true, true);
+								}
+								else
+								{
+									right_ten = get_asm_from_sen(segs.at(i + 1), false, true);
+								}
+								result_ten->memsiz = right_ten->memsiz + 1;
+								result_ten->mem.NULLState();
+								result_ten->mem.Init(2, false);
+								for (int u = 0; u < right_ten->memsiz; ++u)
+								{
+									result_ten->mem.push_back(right_ten->mem[u]);
+								}
+								if (is_a)
+								{
+									result_ten->mem.push_back(205);
+								}
+								else
+								{
+									result_ten->mem.push_back(206);
+								}
+
+								// ptr
+								result_ten->valuetype = 8;
+								result_ten->valuetype_detail = td;
+								segs.erase(i + 1);
+								segs[i]->at(0).type = 'a'; // asm
+								segs[i]->at(0).data.str =
+									reinterpret_cast<char *>(result_ten);
+							}
+							break;
 							}
 						}
 					}
@@ -3231,14 +3210,14 @@ class InsideCode_Bake
 
 		if (segs.size() == 1)
 		{
-			tm = reinterpret_cast < temp_mem * >(segs[0]->at(0).data.str);
+			tm = reinterpret_cast<temp_mem *>(segs[0]->at(0).data.str);
 			return tm;
 		}
 
 		return nullptr;
 	}
 
-	void compile_addVariable(code_sen * cs)
+	void compile_addVariable(code_sen *cs)
 	{
 		sen *code = get_sen_from_codesen(cs);
 		wbss.dbg_sen(code);
@@ -3250,7 +3229,7 @@ class InsideCode_Bake
 		if (blockstack.size() == 0)
 		{
 			// global variable
-			NamingData *nd = (NamingData *) fm->_New(sizeof(NamingData), true);
+			NamingData *nd = (NamingData *)fm->_New(sizeof(NamingData), true);
 			nd->name = (char *)fm->_New(strlen(variable_name) + 1, true);
 			strcpy(nd->name, variable_name);
 			nd->td = get_type_with_namesen(type_name);
@@ -3293,7 +3272,7 @@ class InsideCode_Bake
 							spup += blockstack.at(k)->add_address_up;
 						}
 						spup += basictype[id]->typesiz;
-						*reinterpret_cast < int *>(&mem[writeup]) = spup;
+						*reinterpret_cast<int *>(&mem[writeup]) = spup;
 						writeup += 4;
 
 						NamingData nd;
@@ -3319,7 +3298,7 @@ class InsideCode_Bake
 						{
 							mem[writeup] = 0;
 							++writeup;
-							*reinterpret_cast < int *>(&mem[writeup]) = types.at(i)->typesiz;
+							*reinterpret_cast<int *>(&mem[writeup]) = types.at(i)->typesiz;
 							writeup += 4;
 
 							NamingData nd;
@@ -3342,13 +3321,13 @@ class InsideCode_Bake
 		}
 
 		code->release();
-		fm->_Delete((byte8 *) code, sizeof(sen));
+		fm->_Delete((byte8 *)code, sizeof(sen));
 
 		type_name->release();
-		fm->_Delete((byte8 *) type_name, sizeof(sen));
+		fm->_Delete((byte8 *)type_name, sizeof(sen));
 	}
 
-	void compile_setVariable(code_sen * cs)
+	void compile_setVariable(code_sen *cs)
 	{
 		// dbg_codesen(cs);
 		sen *code = get_sen_from_codesen(cs);
@@ -3384,15 +3363,15 @@ class InsideCode_Bake
 			{
 				mem[writeup++] = left_tm_ptr->mem[i];
 			}
-			mem[writeup++] = (byte8) 199;
+			mem[writeup++] = (byte8)199;
 			for (int i = 0; i < right_tm->memsiz; ++i)
 			{
 				mem[writeup++] = right_tm->mem[i];
 			}
 			if (need_casting)
 			{
-				mem[writeup++] = (byte8) 201;
-				mem[writeup++] = (byte8) castt;
+				mem[writeup++] = (byte8)201;
+				mem[writeup++] = (byte8)castt;
 			}
 			for (int i = 0; i < left_tm_v->memsiz; ++i)
 			{
@@ -3412,13 +3391,13 @@ class InsideCode_Bake
 			switch (lstd->typesiz)
 			{
 			case 1:
-				mem[writeup++] = (byte8) 211;
+				mem[writeup++] = (byte8)211;
 				break;
 			case 2:
-				mem[writeup++] = (byte8) 212;
+				mem[writeup++] = (byte8)212;
 				break;
 			case 4:
-				mem[writeup++] = (byte8) 213;
+				mem[writeup++] = (byte8)213;
 				break;
 			default:
 				cout << "typesiz is more than 4." << endl;
@@ -3426,13 +3405,13 @@ class InsideCode_Bake
 			}
 
 			code->release();
-			fm->_Delete((byte8 *) code, sizeof(sen));
+			fm->_Delete((byte8 *)code, sizeof(sen));
 
 			left_expr->release();
-			fm->_Delete((byte8 *) left_expr, sizeof(sen));
+			fm->_Delete((byte8 *)left_expr, sizeof(sen));
 
 			right_expr->release();
-			fm->_Delete((byte8 *) right_expr, sizeof(sen));
+			fm->_Delete((byte8 *)right_expr, sizeof(sen));
 
 			release_tempmem(left_tm_ptr);
 			release_tempmem(left_tm_v);
@@ -3466,49 +3445,48 @@ class InsideCode_Bake
 			{
 				mem[writeup++] = left_tm->mem[i];
 			}
-			mem[writeup++] = (byte8) 199;
+			mem[writeup++] = (byte8)199;
 			for (int i = 0; i < right_tm->memsiz; ++i)
 			{
 				mem[writeup++] = right_tm->mem[i];
 			}
 			if (need_casting)
 			{
-				mem[writeup++] = (byte8) 201;
-				mem[writeup++] = (byte8) castt;
+				mem[writeup++] = (byte8)201;
+				mem[writeup++] = (byte8)castt;
 			}
 
 			switch (lstd->typesiz)
 			{
 			case 1:
-				mem[writeup++] = (byte8) 211;
+				mem[writeup++] = (byte8)211;
 				break;
 			case 2:
-				mem[writeup++] = (byte8) 212;
+				mem[writeup++] = (byte8)212;
 				break;
 			case 4:
-				mem[writeup++] = (byte8) 213;
+				mem[writeup++] = (byte8)213;
 				break;
 			default:
 				cout << "typesiz is more than 4." << endl;
 				break;
 			}
 
-
 			code->release();
-			fm->_Delete((byte8 *) code, sizeof(sen));
+			fm->_Delete((byte8 *)code, sizeof(sen));
 
 			left_expr->release();
-			fm->_Delete((byte8 *) left_expr, sizeof(sen));
+			fm->_Delete((byte8 *)left_expr, sizeof(sen));
 
 			right_expr->release();
-			fm->_Delete((byte8 *) right_expr, sizeof(sen));
+			fm->_Delete((byte8 *)right_expr, sizeof(sen));
 
 			release_tempmem(left_tm);
 			release_tempmem(right_tm);
 		}
 	}
 
-	void compile_if(code_sen * cs)
+	void compile_if(code_sen *cs)
 	{
 		sen *code = get_sen_from_codesen(cs);
 		int loc = wbss.search_word_first(0, code, "if");
@@ -3529,15 +3507,15 @@ class InsideCode_Bake
 		writeup += 4;
 
 		code->release();
-		fm->_Delete((byte8 *) code, sizeof(sen));
+		fm->_Delete((byte8 *)code, sizeof(sen));
 
 		inner_expr->release();
-		fm->_Delete((byte8 *) inner_expr, sizeof(sen));
+		fm->_Delete((byte8 *)inner_expr, sizeof(sen));
 
 		release_tempmem(inner_tm);
 	}
 
-	void compile_while(code_sen * cs)
+	void compile_while(code_sen *cs)
 	{
 		// fm->dbg_fm1_lifecheck();
 		sen *code = get_sen_from_codesen(cs);
@@ -3559,11 +3537,11 @@ class InsideCode_Bake
 		nextbd.bs = blockstate::bs_while;
 		nextbd.parameter[0] = writeup;
 		nextbd.parameter[1] = save;
-		nextbd.breakpoints = (vecarr < int >*)fm->_New(sizeof(vecarr < int >), true);
+		nextbd.breakpoints = (vecarr<int> *)fm->_New(sizeof(vecarr<int>), true);
 		nextbd.breakpoints->NULLState();
 		nextbd.breakpoints->Init(2, false);
 
-		nextbd.continuepoints = (vecarr < int >*)fm->_New(sizeof(vecarr < int >), true);
+		nextbd.continuepoints = (vecarr<int> *)fm->_New(sizeof(vecarr<int>), true);
 		nextbd.continuepoints->NULLState();
 		nextbd.continuepoints->Init(2, false);
 
@@ -3574,15 +3552,15 @@ class InsideCode_Bake
 		}
 
 		code->release();
-		fm->_Delete((byte8 *) code, sizeof(sen));
+		fm->_Delete((byte8 *)code, sizeof(sen));
 
 		inner_expr->release();
-		fm->_Delete((byte8 *) inner_expr, sizeof(sen));
+		fm->_Delete((byte8 *)inner_expr, sizeof(sen));
 
 		release_tempmem(inner_tm);
 	}
 
-	void compile_block(code_sen * cs)
+	void compile_block(code_sen *cs)
 	{
 		if (nextbd.bs == blockstate::bs_struct)
 		{
@@ -3591,12 +3569,12 @@ class InsideCode_Bake
 			int addadd = 0;
 			for (int i = 0; i < cs->codeblocks->size(); ++i)
 			{
-				code_sen *css = reinterpret_cast < code_sen * >(cs->codeblocks->at(i));
+				code_sen *css = reinterpret_cast<code_sen *>(cs->codeblocks->at(i));
 				if (css->ck == codeKind::ck_addVariable)
 				{
 					NamingData nd;
 					nd.name = css->sen[css->maxlen - 1];
-					sen *typesen = (sen *) fm->_New(sizeof(sen), true);
+					sen *typesen = (sen *)fm->_New(sizeof(sen), true);
 					typesen->NULLState();
 					typesen->Init(2, false);
 					for (int k = 0; k < css->maxlen - 1; ++k)
@@ -3612,12 +3590,12 @@ class InsideCode_Bake
 					nextsd->member_data.push_back(nd);
 
 					typesen->release();
-					fm->_Delete((byte8 *) typesen, sizeof(sen));
+					fm->_Delete((byte8 *)typesen, sizeof(sen));
 				}
 			}
 
-			type_data *td = (type_data *) fm->_New(sizeof(type_data), true);
-			td->structptr = reinterpret_cast < int *>(nextsd);
+			type_data *td = (type_data *)fm->_New(sizeof(type_data), true);
+			td->structptr = reinterpret_cast<int *>(nextsd);
 			td->name = nextsd->name.c_str();
 			td->typetype = 's';
 			td->typesiz = addadd;
@@ -3625,7 +3603,7 @@ class InsideCode_Bake
 		}
 		else
 		{
-			block_data *bd = (block_data *) fm->_New(sizeof(block_data), true);
+			block_data *bd = (block_data *)fm->_New(sizeof(block_data), true);
 			bd->add_address_up = 0;
 			bd->start_pc = &mem[writeup];
 			bd->variable_data.NULLState();
@@ -3650,7 +3628,7 @@ class InsideCode_Bake
 
 			if (blockstack.last()->bs == blockstate::bs_function)
 			{
-				func_data *fd = reinterpret_cast < func_data * >(nextbd.parameter[0]);
+				func_data *fd = reinterpret_cast<func_data *>(nextbd.parameter[0]);
 				fd->start_pc = bd->start_pc;
 
 				for (int k = 0; k < fd->param_data.size(); ++k)
@@ -3660,7 +3638,7 @@ class InsideCode_Bake
 
 				if (strcmp(fd->name.c_str(), "main") == 0)
 				{
-					*reinterpret_cast < uint * >(&mem[2]) = (uint) (fd->start_pc - mem);
+					*reinterpret_cast<uint *>(&mem[2]) = (uint)(fd->start_pc - mem);
 				}
 
 				if (fd->param_data.size() != 0)
@@ -3678,11 +3656,11 @@ class InsideCode_Bake
 
 			for (int i = 0; i < cs->codeblocks->size(); ++i)
 			{
-				code_sen *css = reinterpret_cast < code_sen * >(cs->codeblocks->at(i));
+				code_sen *css = reinterpret_cast<code_sen *>(cs->codeblocks->at(i));
 				dbg_codesen(css);
 				if (css->ck == codeKind::ck_if)
 				{
-					vecarr < int >ifptr_arr;
+					vecarr<int> ifptr_arr;
 					ifptr_arr.NULLState();
 					ifptr_arr.Init(2, true);
 					int ifi = i + 2;
@@ -3692,11 +3670,11 @@ class InsideCode_Bake
 						compile_code(css);
 						continue;
 					}
-					code_sen *css2 = reinterpret_cast < code_sen * >(cs->codeblocks->at(i + 2));
+					code_sen *css2 = reinterpret_cast<code_sen *>(cs->codeblocks->at(i + 2));
 					while (css2 != nullptr && css2->ck == codeKind::ck_if)
 					{
 						stack += 1;
-						css2 = reinterpret_cast < code_sen * >(cs->codeblocks->at(ifi + 2));
+						css2 = reinterpret_cast<code_sen *>(cs->codeblocks->at(ifi + 2));
 						ifi += 2;
 						if (css2 == nullptr)
 						{
@@ -3717,19 +3695,19 @@ class InsideCode_Bake
 					{
 						// else if if
 						compile_code(css);
-						css2 = reinterpret_cast < code_sen * >(cs->codeblocks->at(i + 1));
+						css2 = reinterpret_cast<code_sen *>(cs->codeblocks->at(i + 1));
 						uint address = nextbd.parameter[0];
 						compile_code(css2);
 						mem[writeup++] = 188;
 						ifptr_arr.push_back(writeup);
 						writeup += 4;
 
-						*reinterpret_cast < uint * >(&mem[address]) = (uint) writeup;
+						*reinterpret_cast<uint *>(&mem[address]) = (uint)writeup;
 
 						int ifk = i + 2;
 						while (ifk + 1 <= ifi)
 						{
-							css2 = reinterpret_cast < code_sen * >(cs->codeblocks->at(ifk));
+							css2 = reinterpret_cast<code_sen *>(cs->codeblocks->at(ifk));
 							if (css2->maxlen == 1 && strcmp(css2->sen[0], "else") == 0)
 							{
 								// else
@@ -3742,18 +3720,18 @@ class InsideCode_Bake
 								address = nextbd.parameter[0];
 							}
 
-							css2 = reinterpret_cast < code_sen * >(cs->codeblocks->at(ifk + 1));
+							css2 = reinterpret_cast<code_sen *>(cs->codeblocks->at(ifk + 1));
 							compile_code(css2);
 							mem[writeup++] = 188;
 							ifptr_arr.push_back(writeup);
 							writeup += 4;
-							*reinterpret_cast < uint * >(&mem[address]) = (uint) writeup;
+							*reinterpret_cast<uint *>(&mem[address]) = (uint)writeup;
 							ifk += 2;
 						}
 
 						for (int k = 0; k < ifptr_arr.size(); ++k)
 						{
-							*reinterpret_cast < uint * >(&mem[ifptr_arr[k]]) = (uint) writeup;
+							*reinterpret_cast<uint *>(&mem[ifptr_arr[k]]) = (uint)writeup;
 						}
 
 						i = ifi;
@@ -3768,53 +3746,53 @@ class InsideCode_Bake
 			switch (blockstack.last()->bs)
 			{
 			case blockstate::bs_if:
-				*reinterpret_cast < uint * >(&mem[blockstack.last()->parameter[0]]) =
-					(uint) writeup + 5;
+				*reinterpret_cast<uint *>(&mem[blockstack.last()->parameter[0]]) =
+					(uint)writeup + 5;
 				break;
 			case blockstate::bs_while:
+			{
+				*reinterpret_cast<uint *>(&mem[blockstack.last()->parameter[0]]) =
+					(uint)writeup + 5;
+				for (int i = 0; i < blockstack.last()->breakpoints->size(); ++i)
 				{
-					*reinterpret_cast < uint * >(&mem[blockstack.last()->parameter[0]]) =
-						(uint) writeup + 5;
-					for (int i = 0; i < blockstack.last()->breakpoints->size(); ++i)
-					{
-						*reinterpret_cast < uint * >(&mem[blockstack.last()->breakpoints->at(i)]) =
-							(uint) writeup;
-					}
-
-					for (int i = 0; i < blockstack.last()->continuepoints->size(); ++i)
-					{
-						*reinterpret_cast <
-							uint * >(&mem[blockstack.last()->continuepoints->at(i)]) =
-							(uint) blockstack.last()->parameter[1];
-					}
-
-					mem[writeup++] = 188;	// jmp
-					*reinterpret_cast < uint * >(&mem[writeup]) =
-						(uint) blockstack.last()->parameter[1] - 1;
-					writeup += 4;
+					*reinterpret_cast<uint *>(&mem[blockstack.last()->breakpoints->at(i)]) =
+						(uint)writeup;
 				}
-				break;
+
+				for (int i = 0; i < blockstack.last()->continuepoints->size(); ++i)
+				{
+					*reinterpret_cast<
+						uint *>(&mem[blockstack.last()->continuepoints->at(i)]) =
+						(uint)blockstack.last()->parameter[1];
+				}
+
+				mem[writeup++] = 188; // jmp
+				*reinterpret_cast<uint *>(&mem[writeup]) =
+					(uint)blockstack.last()->parameter[1] - 1;
+				writeup += 4;
+			}
+			break;
 			}
 
 			if (bd->breakpoints != nullptr)
 			{
 				bd->breakpoints->release();
-				fm->_Delete((byte8 *) bd->breakpoints, sizeof(vecarr < int >));
+				fm->_Delete((byte8 *)bd->breakpoints, sizeof(vecarr<int>));
 			}
 			bd->variable_data.release();
 			if (bd->continuepoints != nullptr)
 			{
 				bd->continuepoints->release();
-				fm->_Delete((byte8 *) bd->continuepoints, sizeof(vecarr < int >));
+				fm->_Delete((byte8 *)bd->continuepoints, sizeof(vecarr<int>));
 			}
-			fm->_Delete((byte8 *) bd, sizeof(block_data));
+			fm->_Delete((byte8 *)bd, sizeof(block_data));
 			blockstack.pop_back();
 		}
 	}
 
-	void compile_addFunction(code_sen * cs)
+	void compile_addFunction(code_sen *cs)
 	{
-		func_data *fd = (func_data *) fm->_New(sizeof(func_data), true);
+		func_data *fd = (func_data *)fm->_New(sizeof(func_data), true);
 		fd->name.NULLState();
 		fd->name.Init(2, false);
 
@@ -3840,13 +3818,13 @@ class InsideCode_Bake
 		if (last < 0)
 		{
 			nextbd.bs = blockstate::bs_function;
-			nextbd.parameter[0] = reinterpret_cast < uint64_t > (fd);
+			nextbd.parameter[0] = reinterpret_cast<uint64_t>(fd);
 
 			code->release();
-			fm->_Delete((byte8 *) code, sizeof(sen));
+			fm->_Delete((byte8 *)code, sizeof(sen));
 
 			params_sen->release();
-			fm->_Delete((byte8 *) params_sen, sizeof(sen));
+			fm->_Delete((byte8 *)params_sen, sizeof(sen));
 			return;
 		}
 
@@ -3855,7 +3833,7 @@ class InsideCode_Bake
 			sen *param_sen = wbss.sen_cut(params_sen, savecoma, coma - 1);
 			NamingData nd;
 
-			sen *typestr = (sen *) fm->_New(sizeof(sen), true);
+			sen *typestr = (sen *)fm->_New(sizeof(sen), true);
 			typestr->NULLState();
 			typestr->Init(2, false);
 			for (int i = 0; i < param_sen->size() - 1; ++i)
@@ -3863,11 +3841,10 @@ class InsideCode_Bake
 				typestr->push_back(param_sen->at(i));
 			}
 
-
 			nd.td = get_type_with_namesen(typestr);
 			nd.name = param_sen->last().data.str;
 
-			addadd += nd.td->typesiz;	// 
+			addadd += nd.td->typesiz; //
 			nd.add_address = addadd;
 
 			fd->param_data.push_back(nd);
@@ -3875,17 +3852,17 @@ class InsideCode_Bake
 			coma = wbss.search_word_first(savecoma, params_sen, ",");
 
 			param_sen->release();
-			fm->_Delete((byte8 *) param_sen, sizeof(sen));
+			fm->_Delete((byte8 *)param_sen, sizeof(sen));
 
 			typestr->release();
-			fm->_Delete((byte8 *) typestr, sizeof(sen));
+			fm->_Delete((byte8 *)typestr, sizeof(sen));
 		}
 
 		sen *param_sen = wbss.sen_cut(params_sen, savecoma, last);
 		wbss.dbg_sen(param_sen);
 		NamingData nd;
 
-		sen *typestr = (sen *) fm->_New(sizeof(sen), true);
+		sen *typestr = (sen *)fm->_New(sizeof(sen), true);
 		typestr->NULLState();
 		typestr->Init(2, false);
 		for (int i = 0; i < param_sen->size() - 1; ++i)
@@ -3904,19 +3881,19 @@ class InsideCode_Bake
 		savecoma = coma + 1;
 
 		nextbd.bs = blockstate::bs_function;
-		nextbd.parameter[0] = reinterpret_cast < uint64_t > (fd);
+		nextbd.parameter[0] = reinterpret_cast<uint64_t>(fd);
 
 		code->release();
-		fm->_Delete((byte8 *) code, sizeof(sen));
+		fm->_Delete((byte8 *)code, sizeof(sen));
 
 		param_sen->release();
-		fm->_Delete((byte8 *) param_sen, sizeof(sen));
+		fm->_Delete((byte8 *)param_sen, sizeof(sen));
 
 		typestr->release();
-		fm->_Delete((byte8 *) typestr, sizeof(sen));
+		fm->_Delete((byte8 *)typestr, sizeof(sen));
 	}
 
-	void compile_useFunction(code_sen * cs)
+	void compile_useFunction(code_sen *cs)
 	{
 		func_data *fd = nullptr;
 
@@ -3936,13 +3913,13 @@ class InsideCode_Bake
 				mem[writeup++] = tm->mem[k];
 			}
 			mem[writeup++] = 209;
-			mem[writeup++] = (byte8) tm->valuetype;
+			mem[writeup++] = (byte8)tm->valuetype;
 
 			code->release();
-			fm->_Delete((byte8 *) code, sizeof(sen));
+			fm->_Delete((byte8 *)code, sizeof(sen));
 
 			inner_params->release();
-			fm->_Delete((byte8 *) inner_params, sizeof(sen));
+			fm->_Delete((byte8 *)inner_params, sizeof(sen));
 			return;
 		}
 		else if (strcmp(funcname, "inp") == 0)
@@ -3956,13 +3933,13 @@ class InsideCode_Bake
 				mem[writeup++] = tm->mem[k];
 			}
 			mem[writeup++] = 210;
-			mem[writeup++] = (byte8) tm->valuetype;
+			mem[writeup++] = (byte8)tm->valuetype;
 
 			code->release();
-			fm->_Delete((byte8 *) code, sizeof(sen));
+			fm->_Delete((byte8 *)code, sizeof(sen));
 
 			inner_params->release();
-			fm->_Delete((byte8 *) inner_params, sizeof(sen));
+			fm->_Delete((byte8 *)inner_params, sizeof(sen));
 			return;
 		}
 		else if (strcmp(funcname, "sizeof") == 0)
@@ -3986,19 +3963,19 @@ class InsideCode_Bake
 		sen *params_sen = wbss.sen_cut(code, nameloc + 2, loc - 1);
 		if (params_sen->size() == 0)
 		{
-			mem[writeup++] = 189;	// FUNC
-			mem[writeup++] = 200;	// jmp
-			*reinterpret_cast < uint * >(&mem[writeup]) = (uint) (fd->start_pc - &mem[0]);
+			mem[writeup++] = 189; // FUNC
+			mem[writeup++] = 200; // jmp
+			*reinterpret_cast<uint *>(&mem[writeup]) = (uint)(fd->start_pc - &mem[0]);
 			writeup += 4;
 
 			code->release();
-			fm->_Delete((byte8 *) code, sizeof(sen));
+			fm->_Delete((byte8 *)code, sizeof(sen));
 
 			inner_params->release();
-			fm->_Delete((byte8 *) inner_params, sizeof(sen));
+			fm->_Delete((byte8 *)inner_params, sizeof(sen));
 
 			params_sen->release();
-			fm->_Delete((byte8 *) params_sen, sizeof(sen));
+			fm->_Delete((byte8 *)params_sen, sizeof(sen));
 			return;
 		}
 		int last = params_sen->size() - 1;
@@ -4009,7 +3986,6 @@ class InsideCode_Bake
 		int paramid = 0;
 
 		mem[writeup++] = 189;
-
 
 		while (coma != -1)
 		{
@@ -4024,13 +4000,13 @@ class InsideCode_Bake
 			switch (fd->param_data[paramid].td->typesiz)
 			{
 			case 1:
-				mem[writeup++] = 190;	// param
+				mem[writeup++] = 190; // param
 				break;
 			case 2:
-				mem[writeup++] = 191;	// param
+				mem[writeup++] = 191; // param
 				break;
 			case 4:
-				mem[writeup++] = 192;	// param
+				mem[writeup++] = 192; // param
 				break;
 			}
 
@@ -4040,7 +4016,7 @@ class InsideCode_Bake
 			++paramid;
 
 			param_sen->release();
-			fm->_Delete((byte8 *) param_sen, sizeof(sen));
+			fm->_Delete((byte8 *)param_sen, sizeof(sen));
 
 			release_tempmem(tm);
 		}
@@ -4058,39 +4034,39 @@ class InsideCode_Bake
 		switch (fd->param_data[paramid].td->typesiz)
 		{
 		case 1:
-			mem[writeup++] = 190;	// param
+			mem[writeup++] = 190; // param
 			break;
 		case 2:
-			mem[writeup++] = 191;	// param
+			mem[writeup++] = 191; // param
 			break;
 		case 4:
-			mem[writeup++] = 192;	// param
+			mem[writeup++] = 192; // param
 			break;
 		}
 
-		mem[writeup++] = 200;	// jmp
-		*reinterpret_cast < uint * >(&mem[writeup]) = (uint) (fd->start_pc - &mem[0]);
+		mem[writeup++] = 200; // jmp
+		*reinterpret_cast<uint *>(&mem[writeup]) = (uint)(fd->start_pc - &mem[0]);
 		writeup += 4;
 
 		code->release();
-		fm->_Delete((byte8 *) code, sizeof(sen));
+		fm->_Delete((byte8 *)code, sizeof(sen));
 
 		inner_params->release();
-		fm->_Delete((byte8 *) inner_params, sizeof(sen));
+		fm->_Delete((byte8 *)inner_params, sizeof(sen));
 
 		typen->release();
-		fm->_Delete((byte8 *) typen, sizeof(sen));
+		fm->_Delete((byte8 *)typen, sizeof(sen));
 
 		params_sen->release();
-		fm->_Delete((byte8 *) params_sen, sizeof(sen));
+		fm->_Delete((byte8 *)params_sen, sizeof(sen));
 
 		param_sen->release();
-		fm->_Delete((byte8 *) param_sen, sizeof(sen));
+		fm->_Delete((byte8 *)param_sen, sizeof(sen));
 
 		release_tempmem(tm);
 	}
 
-	void compile_returnInFunction(code_sen * cs)
+	void compile_returnInFunction(code_sen *cs)
 	{
 		sen *code = get_sen_from_codesen(cs);
 		int loc = wbss.search_word_first(0, code, "return");
@@ -4101,31 +4077,31 @@ class InsideCode_Bake
 		{
 			mem[writeup++] = right_tm->mem[i];
 		}
-		mem[writeup++] = (byte8) 193;
+		mem[writeup++] = (byte8)193;
 
 		code->release();
-		fm->_Delete((byte8 *) code, sizeof(sen));
+		fm->_Delete((byte8 *)code, sizeof(sen));
 
 		right_expr->release();
-		fm->_Delete((byte8 *) right_expr, sizeof(sen));
+		fm->_Delete((byte8 *)right_expr, sizeof(sen));
 
 		release_tempmem(right_tm);
 	}
 
-	void compile_addStruct(code_sen * cs)
+	void compile_addStruct(code_sen *cs)
 	{
 		sen *code = get_sen_from_codesen(cs);
 		int loc = wbss.search_word_first(0, code, "struct");
-		struct_data *sd = (struct_data *) fm->_New(sizeof(struct_data), true);
+		struct_data *sd = (struct_data *)fm->_New(sizeof(struct_data), true);
 		sd->name = code->at(loc).data.str;
 		nextsd = sd;
 		nextbd.bs = blockstate::bs_struct;
 
 		code->release();
-		fm->_Delete((byte8 *) code, sizeof(sen));
+		fm->_Delete((byte8 *)code, sizeof(sen));
 	}
 
-	void compile_break(code_sen * cs)
+	void compile_break(code_sen *cs)
 	{
 		if (nextbd.breakpoints != nullptr)
 		{
@@ -4140,7 +4116,7 @@ class InsideCode_Bake
 		}
 	}
 
-	void compile_continue(code_sen * cs)
+	void compile_continue(code_sen *cs)
 	{
 		if (nextbd.continuepoints != nullptr)
 		{
@@ -4155,13 +4131,13 @@ class InsideCode_Bake
 		}
 	}
 
-	void compile_addsetVariable(code_sen * cs)
+	void compile_addsetVariable(code_sen *cs)
 	{
 		sen *code = get_sen_from_codesen(cs);
 		// wbss.dbg_sen(code);
 		int loc = wbss.search_word_first(0, code, "=");
 
-		code_sen *cs0 = (code_sen *) fm->_New(sizeof(code_sen), true);
+		code_sen *cs0 = (code_sen *)fm->_New(sizeof(code_sen), true);
 		cs0->sen = (char **)fm->_New(sizeof(char *) * loc, true);
 		cs0->maxlen = loc;
 		cs0->codeblocks = nullptr;
@@ -4173,7 +4149,7 @@ class InsideCode_Bake
 		}
 		compile_addVariable(cs0);
 
-		code_sen *cs1 = (code_sen *) fm->_New(sizeof(code_sen), true);
+		code_sen *cs1 = (code_sen *)fm->_New(sizeof(code_sen), true);
 		int loc1 = cs->maxlen - loc + 1;
 		cs1->maxlen = loc1;
 		cs1->codeblocks = nullptr;
@@ -4188,15 +4164,15 @@ class InsideCode_Bake
 		compile_setVariable(cs1);
 
 		code->release();
-		fm->_Delete((byte8 *) code, sizeof(sen));
+		fm->_Delete((byte8 *)code, sizeof(sen));
 
-		fm->_Delete((byte8 *) cs0->sen, sizeof(char *) * loc);
-		fm->_Delete((byte8 *) cs1->sen, sizeof(char *) * loc1);
-		fm->_Delete((byte8 *) cs0, sizeof(sen));
-		fm->_Delete((byte8 *) cs1, sizeof(sen));
+		fm->_Delete((byte8 *)cs0->sen, sizeof(char *) * loc);
+		fm->_Delete((byte8 *)cs1->sen, sizeof(char *) * loc1);
+		fm->_Delete((byte8 *)cs0, sizeof(sen));
+		fm->_Delete((byte8 *)cs1, sizeof(sen));
 	}
 
-	int get_typesiz_with_addVariableCs(code_sen * cs)
+	int get_typesiz_with_addVariableCs(code_sen *cs)
 	{
 		if (cs->ck == codeKind::ck_addVariable)
 		{
@@ -4216,7 +4192,7 @@ class InsideCode_Bake
 			// wbss.dbg_sen(code);
 			int loc = wbss.search_word_first(0, code, "=");
 
-			code_sen *cs0 = (code_sen *) fm->_New(sizeof(code_sen), true);
+			code_sen *cs0 = (code_sen *)fm->_New(sizeof(code_sen), true);
 			cs0->sen = (char **)fm->_New(sizeof(char *) * loc, true);
 			cs0->maxlen = loc;
 			cs0->codeblocks = nullptr;
@@ -4237,10 +4213,9 @@ class InsideCode_Bake
 			// reqiure releasr typedata
 			return n;
 		}
-
 	}
 
-	void compile_code(code_sen * cs)
+	void compile_code(code_sen *cs)
 	{
 		cs->start_line = writeup;
 		if (cs->ck != codeKind::ck_blocks)
@@ -4292,8 +4267,8 @@ class InsideCode_Bake
 
 	void bake_code(const char *filename)
 	{
-		lcstr* allcodeptr = GetCodeTXT(filename, fm);
-		lcstr& allcode = *allcodeptr;
+		lcstr *allcodeptr = GetCodeTXT(filename, fm);
+		lcstr &allcode = *allcodeptr;
 		AddTextBlocks(allcode);
 
 		for (int i = 0; i < allcode_sen.size(); ++i)
@@ -4306,9 +4281,9 @@ class InsideCode_Bake
 		}
 		cout << endl;
 
-		vecarr < code_sen * >*senstptr = AddCodeFromBlockData(allcode_sen, "struct");
+		vecarr<code_sen *> *senstptr = AddCodeFromBlockData(allcode_sen, "struct");
 
-		vecarr < code_sen * >*senptr = AddCodeFromBlockData(allcode_sen, "none");
+		vecarr<code_sen *> *senptr = AddCodeFromBlockData(allcode_sen, "none");
 		senptr->islocal = false;
 
 		csarr = senptr;
@@ -4328,9 +4303,9 @@ class InsideCode_Bake
 		}
 		datamem.Init(gs + 1, false);
 
-		mem[writeup++] = 189;	// func
-		mem[writeup++] = 200;	// jmp
-		writeup += 4;			// start function address
+		mem[writeup++] = 189; // func
+		mem[writeup++] = 200; // jmp
+		writeup += 4;		  // start function address
 
 		for (int i = 0; i < senptr->size(); ++i)
 		{
@@ -4347,9 +4322,9 @@ class InsideCode_Bake
 	}
 };
 
-vecarr < InsideCode_Bake * >icbarr;
+vecarr<InsideCode_Bake *> icbarr;
 
-int code_control(vecarr < InsideCode_Bake * >*icbarr)
+int code_control(vecarr<InsideCode_Bake *> *icbarr)
 {
 	/*
 	static int stack = 0;
@@ -4374,11 +4349,11 @@ int code_control(vecarr < InsideCode_Bake * >*icbarr)
 		return 0;
 	}
 */
-	return 1;					// keep going
+	return 1; // keep going
 }
 
-void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
-			 int (*control_func) (vecarr < InsideCode_Bake * >*), bool init)
+void execute(vecarr<InsideCode_Bake *> icbarr, int execodenum,
+			 int (*control_func)(vecarr<InsideCode_Bake *> *), bool init)
 {
 	byte8 *tmptr_b;
 	ushort *tmptr_s;
@@ -4398,8 +4373,8 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	uint strmax = 0;
 	InsideCode_Bake *icb;
 
-	byte8 **pc = nullptr;		// program counter
-	byte8 **sp = nullptr;		// stack pointer
+	byte8 **pc = nullptr; // program counter
+	byte8 **sp = nullptr; // stack pointer
 
 	byte8 **pcb = nullptr;
 	ushort **pcs = nullptr;
@@ -4409,13 +4384,13 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	ushort **sps = nullptr;
 	uint **spi = nullptr;
 
-	vecarr < byte8 * >*fsp = nullptr;
-	vecarr < byte8 * >*call_stack = nullptr;
-	circularArray < uint64_t > _as;
-	circularArray < uint64_t > _bs;
+	vecarr<byte8 *> *fsp = nullptr;
+	vecarr<byte8 *> *call_stack = nullptr;
+	circularArray<uint64_t> _as;
+	circularArray<uint64_t> _bs;
 
-	byte8 **rfsp = 0;			// function stack pos
-	byte8 **lfsp = 0;			// last function stack pos
+	byte8 **rfsp = 0; // function stack pos
+	byte8 **lfsp = 0; // last function stack pos
 
 	byte8 **rfspb = nullptr;
 	ushort **rfsps = nullptr;
@@ -4432,10 +4407,9 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	void **inpt = nullptr;
 
 	goto INST_INIT;
-  INST_INIT_END:
+INST_INIT_END:
 
-
-  CONTEXT_SWITCH:
+CONTEXT_SWITCH:
 
 	if (n == maxo)
 	{
@@ -4468,35 +4442,34 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	dbgt = icb->dbgt;
 	inpt = icb->inpt;
 
-	pc = &icb->pc;				// program counter
-	sp = &icb->sp;				// stack pointer
+	pc = &icb->pc; // program counter
+	sp = &icb->sp; // stack pointer
 
 	fsp = &icb->fsp;
 	call_stack = &icb->call_stack;
 
-	rfsp = &icb->rfsp;			// function stack pos
-	lfsp = &icb->lfsp;			// last function stack pos
+	rfsp = &icb->rfsp; // function stack pos
+	lfsp = &icb->lfsp; // last function stack pos
 
 	pcb = pc;
-	pcs = reinterpret_cast < ushort ** >(pc);
-	pci = reinterpret_cast < uint ** >(pc);
+	pcs = reinterpret_cast<ushort **>(pc);
+	pci = reinterpret_cast<uint **>(pc);
 
 	spb = sp;
-	sps = reinterpret_cast < ushort ** >(sp);
-	spi = reinterpret_cast < uint ** >(sp);
+	sps = reinterpret_cast<ushort **>(sp);
+	spi = reinterpret_cast<uint **>(sp);
 
 	rfspb = rfsp;
-	rfsps = reinterpret_cast < ushort ** >(rfsp);
-	rfspi = reinterpret_cast < uint ** >(rfsp);
+	rfsps = reinterpret_cast<ushort **>(rfsp);
+	rfspi = reinterpret_cast<uint **>(rfsp);
 
 	lfspb = lfsp;
-	lfsps = reinterpret_cast < ushort ** >(lfsp);
-	lfspi = reinterpret_cast < uint ** >(lfsp);
+	lfsps = reinterpret_cast<ushort **>(lfsp);
+	lfspi = reinterpret_cast<uint **>(lfsp);
 
 	goto *inst[**pc];
 
-
-  INSTEND:
+INSTEND:
 	++exed_num;
 	if (exed_num >= execodenum)
 	{
@@ -4513,20 +4486,20 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	}
 	goto *inst[**pc];
 
-  PROGRAMQUIT:
+PROGRAMQUIT:
 	return;
 
 	// write every inst code
 
 	// loc of sp
-  ADD_STACK_VARIABLE:
+ADD_STACK_VARIABLE:
 	++*pc;
 	*sp = (*rfsp - **pci);
 	++*pci;
 	goto INSTEND;
 
 	// var_id, value(byte)
-  SET_STACK_VARIABLE_CONST_1:
+SET_STACK_VARIABLE_CONST_1:
 	++*pc;
 	tmptr_b = (*rfsp - **pci);
 	++*pci;
@@ -4535,67 +4508,67 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	goto INSTEND;
 
 	// var_id, value(ushort)
-  SET_STACK_VARIABLE_CONST_2:
+SET_STACK_VARIABLE_CONST_2:
 	++*pc;
-	tmptr_s = reinterpret_cast < ushort * >(*rfsp - (**pci));
+	tmptr_s = reinterpret_cast<ushort *>(*rfsp - (**pci));
 	++*pci;
 	*tmptr_s = **pcs;
 	++*pcs;
 	goto INSTEND;
 
 	// var_id, value(uint)
-  SET_STACK_VARIABLE_CONST_4:
+SET_STACK_VARIABLE_CONST_4:
 	++*pc;
-	tmptr_i = reinterpret_cast < uint * >(*rfsp - (**pci));
+	tmptr_i = reinterpret_cast<uint *>(*rfsp - (**pci));
 	++*pci;
 	*tmptr_i = **pci;
 	++*pc;
 	goto INSTEND;
 
 	// var_id
-  SET_STACK_VARIABLE_FROMX_1:
+SET_STACK_VARIABLE_FROMX_1:
 	++*pc;
-	*(*rfsp - (**pci)) = (byte8) _x;
+	*(*rfsp - (**pci)) = (byte8)_x;
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_STACK_VARIABLE_FROMX_2:
+SET_STACK_VARIABLE_FROMX_2:
 	++*pc;
-	*reinterpret_cast < ushort * >(*rfsp - (**pci)) = (ushort) _x;
+	*reinterpret_cast<ushort *>(*rfsp - (**pci)) = (ushort)_x;
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_STACK_VARIABLE_FROMX_4:
+SET_STACK_VARIABLE_FROMX_4:
 	++*pc;
-	*reinterpret_cast < uint * >(*rfsp - (**pci)) = (uint) _x;
+	*reinterpret_cast<uint *>(*rfsp - (**pci)) = (uint)_x;
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_STACK_VARIABLE_FROMY_1:
+SET_STACK_VARIABLE_FROMY_1:
 	++*pc;
-	*(*rfsp - (**pci)) = (byte8) _y;
+	*(*rfsp - (**pci)) = (byte8)_y;
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_STACK_VARIABLE_FROMY_2:
+SET_STACK_VARIABLE_FROMY_2:
 	++*pc;
-	*reinterpret_cast < ushort * >(*rfsp - (**pci)) = (ushort) _y;
+	*reinterpret_cast<ushort *>(*rfsp - (**pci)) = (ushort)_y;
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_STACK_VARIABLE_FROMY_4:
+SET_STACK_VARIABLE_FROMY_4:
 	++*pc;
-	*reinterpret_cast < uint * >(*rfsp - (**pci)) = (uint) _y;
+	*reinterpret_cast<uint *>(*rfsp - (**pci)) = (uint)_y;
 	++*pci;
 	goto INSTEND;
 
 	// var_id, address
-  SET_STACK_VARIABLE_ADDRESS_1:
+SET_STACK_VARIABLE_ADDRESS_1:
 	++*pc;
 	tmptr_b = (*rfsp - (**pci));
 	++*pci;
@@ -4604,25 +4577,25 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	goto INSTEND;
 
 	// var_id, address
-  SET_STACK_VARIABLE_ADDRESS_2:
+SET_STACK_VARIABLE_ADDRESS_2:
 	++*pc;
-	tmptr_s = reinterpret_cast < ushort * >(*rfsp - (**pci));
+	tmptr_s = reinterpret_cast<ushort *>(*rfsp - (**pci));
 	++*pci;
-	*tmptr_s = *reinterpret_cast < ushort * >(&mem[**pci]);
+	*tmptr_s = *reinterpret_cast<ushort *>(&mem[**pci]);
 	++*pci;
 	goto INSTEND;
 
 	// var_id, address
-  SET_STACK_VARIABLE_ADDRESS_4:
+SET_STACK_VARIABLE_ADDRESS_4:
 	++*pc;
-	tmptr_i = reinterpret_cast < uint * >(*rfsp - (**pci));
+	tmptr_i = reinterpret_cast<uint *>(*rfsp - (**pci));
 	++*pci;
-	*tmptr_i = *reinterpret_cast < uint * >(&mem[**pci]);
+	*tmptr_i = *reinterpret_cast<uint *>(&mem[**pci]);
 	++*pci;
 	goto INSTEND;
 
 	// var_id, var_id
-  SET_STACK_VARIABLE_VARIABLE_1:
+SET_STACK_VARIABLE_VARIABLE_1:
 	++*pc;
 	tmptr_b = (*rfsp - (**pci));
 	++*pci;
@@ -4631,32 +4604,32 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	goto INSTEND;
 
 	// var_id, var_id
-  SET_STACK_VARIABLE_VARIABLE_2:
+SET_STACK_VARIABLE_VARIABLE_2:
 	++*pc;
-	tmptr_s = reinterpret_cast < ushort * >(*rfsp - (**pci));
+	tmptr_s = reinterpret_cast<ushort *>(*rfsp - (**pci));
 	++*pci;
-	*tmptr_s = *reinterpret_cast < ushort * >(*rfsp - (**pci));
+	*tmptr_s = *reinterpret_cast<ushort *>(*rfsp - (**pci));
 	++*pci;
 	goto INSTEND;
 
 	// var_id, var_id
-  SET_STACK_VARIABLE_VARIABLE_4:
+SET_STACK_VARIABLE_VARIABLE_4:
 	++*pc;
-	tmptr_i = reinterpret_cast < uint * >(*rfsp - (**pci));
+	tmptr_i = reinterpret_cast<uint *>(*rfsp - (**pci));
 	++*pci;
-	*tmptr_i = *reinterpret_cast < uint * >(*rfsp - (**pci));
+	*tmptr_i = *reinterpret_cast<uint *>(*rfsp - (**pci));
 	++*pci;
 	goto INSTEND;
 
 	// const(byte)
-  SET_A_CONST_1:
+SET_A_CONST_1:
 	_as.move_pivot(-1);
 	_as[0] = *++*pc;
 	++*pc;
 	goto INSTEND;
 
 	// const(ushort)
-  SET_A_CONST_2:
+SET_A_CONST_2:
 	++*pc;
 	_as.move_pivot(-1);
 	_as[0] = **pcs;
@@ -4664,7 +4637,7 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	goto INSTEND;
 
 	// const(uint)
-  SET_A_CONST_4:
+SET_A_CONST_4:
 	++*pc;
 	_as.move_pivot(-1);
 	_as[0] = **pci;
@@ -4672,7 +4645,7 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	goto INSTEND;
 
 	// address
-  SET_A_ADDRESS_1:
+SET_A_ADDRESS_1:
 	++*pc;
 	_as.move_pivot(-1);
 	_as[0] = mem[**pci];
@@ -4680,23 +4653,23 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	goto INSTEND;
 
 	// address
-  SET_A_ADDRESS_2:
+SET_A_ADDRESS_2:
 	++*pc;
 	_as.move_pivot(-1);
-	_as[0] = *reinterpret_cast < ushort * >(&mem[**pci]);
+	_as[0] = *reinterpret_cast<ushort *>(&mem[**pci]);
 	++pci;
 	goto INSTEND;
 
 	// address
-  SET_A_ADDRESS_4:
+SET_A_ADDRESS_4:
 	++*pc;
 	_as.move_pivot(-1);
-	_as[0] = *reinterpret_cast < uint * >(&mem[**pci]);
+	_as[0] = *reinterpret_cast<uint *>(&mem[**pci]);
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_A_VARIABLE_1:
+SET_A_VARIABLE_1:
 	++*pc;
 	_as.move_pivot(-1);
 	_as[0] = *(*rfsp - (**pci));
@@ -4704,30 +4677,30 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	goto INSTEND;
 
 	// var_id
-  SET_A_VARIABLE_2:
+SET_A_VARIABLE_2:
 	++*pc;
 	_as.move_pivot(-1);
-	_as[0] = *reinterpret_cast < ushort * >(*rfsp - (**pci));
+	_as[0] = *reinterpret_cast<ushort *>(*rfsp - (**pci));
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_A_VARIABLE_4:
+SET_A_VARIABLE_4:
 	++*pc;
 	_as.move_pivot(-1);
-	_as[0] = *reinterpret_cast < uint * >(*rfsp - (**pci));
+	_as[0] = *reinterpret_cast<uint *>(*rfsp - (**pci));
 	++*pci;
 	goto INSTEND;
 
 	// const(byte)
-  SET_B_CONST_1:
+SET_B_CONST_1:
 	_bs.move_pivot(-1);
 	_bs[0] = *++*pc;
 	++*pc;
 	goto INSTEND;
 
 	// const(ushort)
-  SET_B_CONST_2:
+SET_B_CONST_2:
 	++*pc;
 	_bs.move_pivot(-1);
 	_bs[0] = **pcs;
@@ -4735,7 +4708,7 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	goto INSTEND;
 
 	// const(uint)
-  SET_B_CONST_4:
+SET_B_CONST_4:
 	++*pc;
 	_bs.move_pivot(-1);
 	_bs[0] = **pci;
@@ -4743,7 +4716,7 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	goto INSTEND;
 
 	// address
-  SET_B_ADDRESS_1:
+SET_B_ADDRESS_1:
 	++*pc;
 	_bs.move_pivot(-1);
 	_bs[0] = mem[**pci];
@@ -4751,23 +4724,23 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	goto INSTEND;
 
 	// address
-  SET_B_ADDRESS_2:
+SET_B_ADDRESS_2:
 	++*pc;
 	_bs.move_pivot(-1);
-	_bs[0] = *reinterpret_cast < ushort * >(&mem[**pci]);
+	_bs[0] = *reinterpret_cast<ushort *>(&mem[**pci]);
 	++*pci;
 	goto INSTEND;
 
 	// address
-  SET_B_ADDRESS_4:
+SET_B_ADDRESS_4:
 	++*pc;
 	_bs.move_pivot(-1);
-	_bs[0] = *reinterpret_cast < uint * >(&mem[**pci]);
+	_bs[0] = *reinterpret_cast<uint *>(&mem[**pci]);
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_B_VARIABLE_1:
+SET_B_VARIABLE_1:
 	++*pc;
 	_bs.move_pivot(-1);
 	_bs[0] = *(*rfsp - (**pci));
@@ -4775,982 +4748,976 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	goto INSTEND;
 
 	// var_id
-  SET_B_VARIABLE_2:
+SET_B_VARIABLE_2:
 	++*pc;
 	_bs.move_pivot(-1);
-	_bs[0] = *reinterpret_cast < ushort * >(*rfsp - (**pci));
+	_bs[0] = *reinterpret_cast<ushort *>(*rfsp - (**pci));
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_B_VARIABLE_4:
+SET_B_VARIABLE_4:
 	++*pc;
 	_bs.move_pivot(-1);
-	_bs[0] = *reinterpret_cast < uint * >(*rfsp - (**pci));
+	_bs[0] = *reinterpret_cast<uint *>(*rfsp - (**pci));
 	++*pci;
 	goto INSTEND;
 
 	// const(byte)
-  SET_X_CONST_1:
+SET_X_CONST_1:
 	_x = *++*pc;
 	++*pc;
 	goto INSTEND;
 
 	// const(ushort)
-  SET_X_CONST_2:
+SET_X_CONST_2:
 	++*pc;
 	_x = **pcs;
 	++*pcs;
 	goto INSTEND;
 
 	// const(uint)
-  SET_X_CONST_4:
+SET_X_CONST_4:
 	++*pc;
 	_x = **pci;
 	++*pci;
 	goto INSTEND;
 
 	// address
-  SET_X_ADDRESS_1:
+SET_X_ADDRESS_1:
 	++*pc;
 	_x = mem[**pci];
 	++*pci;
 	goto INSTEND;
 
 	// address
-  SET_X_ADDRESS_2:
+SET_X_ADDRESS_2:
 	++*pc;
-	_x = *reinterpret_cast < ushort * >(&mem[**pci]);
+	_x = *reinterpret_cast<ushort *>(&mem[**pci]);
 	++*pci;
 	goto INSTEND;
 
 	// address
-  SET_X_ADDRESS_4:
+SET_X_ADDRESS_4:
 	++*pc;
-	_x = *reinterpret_cast < uint * >(&mem[**pci]);
+	_x = *reinterpret_cast<uint *>(&mem[**pci]);
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_X_VARIABLE_1:
+SET_X_VARIABLE_1:
 	++*pc;
 	_x = *(*rfsp - (**pci));
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_X_VARIABLE_2:
+SET_X_VARIABLE_2:
 	++*pc;
-	_x = *reinterpret_cast < ushort * >(*rfsp - (**pci));
+	_x = *reinterpret_cast<ushort *>(*rfsp - (**pci));
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_X_VARIABLE_4:
+SET_X_VARIABLE_4:
 	++*pc;
-	_x = *reinterpret_cast < uint * >(*rfsp - (**pci));
+	_x = *reinterpret_cast<uint *>(*rfsp - (**pci));
 	++*pci;
 	goto INSTEND;
 
 	// const(byte)
-  SET_Y_CONST_1:
+SET_Y_CONST_1:
 	_y = *++*pc;
 	++*pc;
 	goto INSTEND;
 
 	// const(ushort)
-  SET_Y_CONST_2:
+SET_Y_CONST_2:
 	++*pc;
 	_y = **pcs;
 	++*pcs;
 	goto INSTEND;
 
 	// const(uint)
-  SET_Y_CONST_4:
+SET_Y_CONST_4:
 	++*pc;
 	_y = **pci;
 	++*pci;
 	goto INSTEND;
 
 	// address
-  SET_Y_ADDRESS_1:
+SET_Y_ADDRESS_1:
 	++*pc;
 	_y = mem[**pci];
 	++*pci;
 	goto INSTEND;
 
 	// address
-  SET_Y_ADDRESS_2:
+SET_Y_ADDRESS_2:
 	++*pc;
-	_y = *reinterpret_cast < ushort * >(&mem[**pci]);
+	_y = *reinterpret_cast<ushort *>(&mem[**pci]);
 	++*pci;
 	goto INSTEND;
 
 	// address
-  SET_Y_ADDRESS_4:
+SET_Y_ADDRESS_4:
 	++*pc;
-	_y = *reinterpret_cast < uint * >(&mem[**pci]);
+	_y = *reinterpret_cast<uint *>(&mem[**pci]);
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_Y_VARIABLE_1:
+SET_Y_VARIABLE_1:
 	++*pc;
 	_y = *(*rfsp - (**pci));
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_Y_VARIABLE_2:
+SET_Y_VARIABLE_2:
 	++*pc;
-	_y = *reinterpret_cast < ushort * >(*rfsp - (**pci));
+	_y = *reinterpret_cast<ushort *>(*rfsp - (**pci));
 	++*pci;
 	goto INSTEND;
 
 	// var_id
-  SET_Y_VARIABLE_4:
+SET_Y_VARIABLE_4:
 	++*pc;
-	_y = *reinterpret_cast < uint * >(*rfsp - (**pci));
+	_y = *reinterpret_cast<uint *>(*rfsp - (**pci));
 	++*pci;
 	goto INSTEND;
 
 	// no param
-  AXBY:
+AXBY:
 	_x = _as[0];
 	_y = _bs[0];
 	++*pc;
 	goto INSTEND;
 
 	// ADD (NO PARAM) ...
-  AU_BYTE_ADD_A:
-   _as.move_pivot(-1);
-  _as[0] = (char)((char)_x + (char)_y);
+AU_BYTE_ADD_A:
+	_as.move_pivot(-1);
+	_as[0] = (char)((char)_x + (char)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_BYTE_ADD_B:
+AU_BYTE_ADD_B:
 	_b = (char)((char)_x + (char)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UBYTE_ADD_A:
+AU_UBYTE_ADD_A:
 	_as.move_pivot(-1);
-  _as[0] = (byte8) ((byte8) _x + (byte8) _y);
+	_as[0] = (byte8)((byte8)_x + (byte8)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UBYTE_ADD_B:
+AU_UBYTE_ADD_B:
 	_bs.move_pivot(-1);
-	_bs[0] = (byte8) ((byte8) _x + (byte8) _y);
+	_bs[0] = (byte8)((byte8)_x + (byte8)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_SHORT_ADD_A:
+AU_SHORT_ADD_A:
 	_as.move_pivot(-1);
-  _as[0] = (short)((short)_x + (short)_y);
+	_as[0] = (short)((short)_x + (short)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_SHORT_ADD_B:
+AU_SHORT_ADD_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (short)((short)_x + (short)_y);
+	_bs[0] = (short)((short)_x + (short)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_USHORT_ADD_A:
+AU_USHORT_ADD_A:
 	_as.move_pivot(-1);
-  _as[0] = (ushort) ((ushort) _x + (ushort) _y);
+	_as[0] = (ushort)((ushort)_x + (ushort)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_USHORT_ADD_B:
+AU_USHORT_ADD_B:
 	_bs.move_pivot(-1);
-	_bs[0] = (ushort) ((ushort) _x + (ushort) _y);
+	_bs[0] = (ushort)((ushort)_x + (ushort)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_INT_ADD_A:
+AU_INT_ADD_A:
 	_as.move_pivot(-1);
-  _as[0] = (int)((int)_x + (int)_y);
+	_as[0] = (int)((int)_x + (int)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_INT_ADD_B:
+AU_INT_ADD_B:
 	_bs.move_pivot(-1);
 	_bs[0] = (int)((int)_x + (int)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UINT_ADD_A:
+AU_UINT_ADD_A:
 	_as.move_pivot(-1);
-  _as[0] = (uint) ((uint) _x + (uint) _y);
+	_as[0] = (uint)((uint)_x + (uint)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UINT_ADD_B:
+AU_UINT_ADD_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (uint) ((uint) _x + (uint) _y);
+	_bs[0] = (uint)((uint)_x + (uint)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_FLOAT_ADD_A:
+AU_FLOAT_ADD_A:
 	_as.move_pivot(-1);
-  _as[0] = (float)((float)_x + (float)_y);
+	_as[0] = (float)((float)_x + (float)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_FLOAT_ADD_B:
+AU_FLOAT_ADD_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (float)((float)_x + (float)_y);
+	_bs[0] = (float)((float)_x + (float)_y);
 	++*pc;
 	goto INSTEND;
-
-
 
 	// MIN (NO PARAM) ...
-  AU_BYTE_MIN_A:
+AU_BYTE_MIN_A:
 	_as.move_pivot(-1);
-  _as[0] = (char)((char)_x - (char)_y);
+	_as[0] = (char)((char)_x - (char)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_BYTE_MIN_B:
+AU_BYTE_MIN_B:
 	_bs.move_pivot(-1);
 	_bs[0] = (char)((char)_x - (char)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UBYTE_MIN_A:
+AU_UBYTE_MIN_A:
 	_as.move_pivot(-1);
-  _as[0] = (byte8) ((byte8) _x - (byte8) _y);
+	_as[0] = (byte8)((byte8)_x - (byte8)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UBYTE_MIN_B:
+AU_UBYTE_MIN_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (byte8) ((byte8) _x - (byte8) _y);
+	_bs[0] = (byte8)((byte8)_x - (byte8)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_SHORT_MIN_A:
+AU_SHORT_MIN_A:
 	_as.move_pivot(-1);
-  _as[0] = (short)((short)_x - (short)_y);
+	_as[0] = (short)((short)_x - (short)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_SHORT_MIN_B:
+AU_SHORT_MIN_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (short)((short)_x - (short)_y);
+	_bs[0] = (short)((short)_x - (short)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_USHORT_MIN_A:
+AU_USHORT_MIN_A:
 	_as.move_pivot(-1);
-  _as[0] = (ushort) ((ushort) _x - (ushort) _y);
+	_as[0] = (ushort)((ushort)_x - (ushort)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_USHORT_MIN_B:
+AU_USHORT_MIN_B:
 	_bs.move_pivot(-1);
-	_bs[0] = (ushort) ((ushort) _x - (ushort) _y);
+	_bs[0] = (ushort)((ushort)_x - (ushort)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_INT_MIN_A:
+AU_INT_MIN_A:
 	_as.move_pivot(-1);
-  _as[0] = (int)((int)_x - (int)_y);
+	_as[0] = (int)((int)_x - (int)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_INT_MIN_B:
+AU_INT_MIN_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (int)((int)_x - (int)_y);
+	_bs[0] = (int)((int)_x - (int)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UINT_MIN_A:
+AU_UINT_MIN_A:
 	_as.move_pivot(-1);
-  _as[0] = (uint) ((uint) _x - (uint) _y);
+	_as[0] = (uint)((uint)_x - (uint)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UINT_MIN_B:
+AU_UINT_MIN_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (uint) ((uint) _x - (uint) _y);
+	_bs[0] = (uint)((uint)_x - (uint)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_FLOAT_MIN_A:
+AU_FLOAT_MIN_A:
 	_as.move_pivot(-1);
-  _as[0] = (float)((float)_x - (float)_y);
+	_as[0] = (float)((float)_x - (float)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_FLOAT_MIN_B:
+AU_FLOAT_MIN_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (float)((float)_x - (float)_y);
+	_bs[0] = (float)((float)_x - (float)_y);
 	++*pc;
 	goto INSTEND;
-
 
 	// MUL (NO PARAM) ...
-  AU_BYTE_MUL_A:
+AU_BYTE_MUL_A:
 	_as.move_pivot(-1);
-  _as[0] = (char)((char)_x * (char)_y);
+	_as[0] = (char)((char)_x * (char)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_BYTE_MUL_B:
+AU_BYTE_MUL_B:
 	_bs.move_pivot(-1);
 	_bs[0] = (char)((char)_x * (char)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UBYTE_MUL_A:
+AU_UBYTE_MUL_A:
 	_as.move_pivot(-1);
-  _as[0] = (char)((byte8) _x * (byte8) _y);
+	_as[0] = (char)((byte8)_x * (byte8)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UBYTE_MUL_B:
+AU_UBYTE_MUL_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (char)((byte8) _x * (byte8) _y);
+	_bs[0] = (char)((byte8)_x * (byte8)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_SHORT_MUL_A:
+AU_SHORT_MUL_A:
 	_as.move_pivot(-1);
-  _as[0] = (short)((short)_x * (short)_y);
+	_as[0] = (short)((short)_x * (short)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_SHORT_MUL_B:
+AU_SHORT_MUL_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (short)((short)_x * (short)_y);
+	_bs[0] = (short)((short)_x * (short)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_USHORT_MUL_A:
+AU_USHORT_MUL_A:
 	_as.move_pivot(-1);
-  _as[0] = (ushort) ((ushort) _x * (ushort) _y);
+	_as[0] = (ushort)((ushort)_x * (ushort)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_USHORT_MUL_B:
+AU_USHORT_MUL_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (ushort) ((ushort) _x * (ushort) _y);
+	_bs[0] = (ushort)((ushort)_x * (ushort)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_INT_MUL_A:
+AU_INT_MUL_A:
 	_as.move_pivot(-1);
-  _as[0] = (int)((int)_x * (int)_y);
+	_as[0] = (int)((int)_x * (int)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_INT_MUL_B:
+AU_INT_MUL_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (int)((int)_x * (int)_y);
+	_bs[0] = (int)((int)_x * (int)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UINT_MUL_A:
+AU_UINT_MUL_A:
 	_as.move_pivot(-1);
-  _as[0] = (uint) ((uint) _x * (uint) _y);
+	_as[0] = (uint)((uint)_x * (uint)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UINT_MUL_B:
+AU_UINT_MUL_B:
 	_bs.move_pivot(-1);
-	_bs[0] = (uint) ((uint) _x * (uint) _y);
+	_bs[0] = (uint)((uint)_x * (uint)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_FLOAT_MUL_A:
+AU_FLOAT_MUL_A:
 	_as.move_pivot(-1);
-  _as[0] =  (float)((float)_x * (float)_y);
+	_as[0] = (float)((float)_x * (float)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_FLOAT_MUL_B:
+AU_FLOAT_MUL_B:
 	_bs.move_pivot(-1);
 	_bs[0] = (float)((float)_x * (float)_y);
 	++*pc;
 	goto INSTEND;
 
-
-
 	// DIV (NO PARAM) ...
-  AU_BYTE_DIV_A:
+AU_BYTE_DIV_A:
 	_as.move_pivot(-1);
-  _as[0] = (char)((char)_x / (char)_y);
+	_as[0] = (char)((char)_x / (char)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_BYTE_DIV_B:
+AU_BYTE_DIV_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (char)((char)_x / (char)_y);
+	_bs[0] = (char)((char)_x / (char)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UBYTE_DIV_A:
+AU_UBYTE_DIV_A:
 	_as.move_pivot(-1);
-  _as[0] = (byte8) ((byte8) _x / (byte8) _y);
+	_as[0] = (byte8)((byte8)_x / (byte8)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UBYTE_DIV_B:
+AU_UBYTE_DIV_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (byte8) ((byte8) _x / (byte8) _y);
+	_bs[0] = (byte8)((byte8)_x / (byte8)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_SHORT_DIV_A:
+AU_SHORT_DIV_A:
 	_as.move_pivot(-1);
-  _as[0] = (short)((short)_x / (short)_y);
+	_as[0] = (short)((short)_x / (short)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_SHORT_DIV_B:
+AU_SHORT_DIV_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (short)((short)_x / (short)_y);
+	_bs[0] = (short)((short)_x / (short)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_USHORT_DIV_A:
+AU_USHORT_DIV_A:
 	_as.move_pivot(-1);
-  _as[0] = (ushort) ((ushort) _x / (ushort) _y);
+	_as[0] = (ushort)((ushort)_x / (ushort)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_USHORT_DIV_B:
+AU_USHORT_DIV_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (ushort) ((ushort) _x / (ushort) _y);
+	_bs[0] = (ushort)((ushort)_x / (ushort)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_INT_DIV_A:
+AU_INT_DIV_A:
 	_as.move_pivot(-1);
-  _as[0] =  (int)((int)_x / (int)_y);
+	_as[0] = (int)((int)_x / (int)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_INT_DIV_B:
+AU_INT_DIV_B:
 	_bs.move_pivot(-1);
 	_bs[0] = (int)((int)_x / (int)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UINT_DIV_A:
+AU_UINT_DIV_A:
 	_as.move_pivot(-1);
-  _as[0] = (uint) ((uint) _x / (uint) _y);
+	_as[0] = (uint)((uint)_x / (uint)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UINT_DIV_B:
+AU_UINT_DIV_B:
 	_bs.move_pivot(-1);
-	_bs[0] = (uint) ((uint) _x / (uint) _y);
+	_bs[0] = (uint)((uint)_x / (uint)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_FLOAT_DIV_A:
+AU_FLOAT_DIV_A:
 	_as.move_pivot(-1);
-  _as[0] = (float)((float)_x / (float)_y);
+	_as[0] = (float)((float)_x / (float)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_FLOAT_DIV_B:
+AU_FLOAT_DIV_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (float)((float)_x / (float)_y);
+	_bs[0] = (float)((float)_x / (float)_y);
 	++*pc;
 	goto INSTEND;
 
 	// PER (NO PARAM) ...
-  AU_BYTE_PER_A:
+AU_BYTE_PER_A:
 	_as.move_pivot(-1);
-  _as[0] = (char)((char)_x % (char)_y);
+	_as[0] = (char)((char)_x % (char)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_BYTE_PER_B:
+AU_BYTE_PER_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (char)((char)_x % (char)_y);
+	_bs[0] = (char)((char)_x % (char)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UBYTE_PER_A:
+AU_UBYTE_PER_A:
 	_as.move_pivot(-1);
-  _as[0] = (char)((byte8) _x % (byte8) _y);
+	_as[0] = (char)((byte8)_x % (byte8)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UBYTE_PER_B:
+AU_UBYTE_PER_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (char)((byte8) _x % (byte8) _y);
+	_bs[0] = (char)((byte8)_x % (byte8)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_SHORT_PER_A:
+AU_SHORT_PER_A:
 	_as.move_pivot(-1);
-  _as[0] = (char)((short)_x % (short)_y);
+	_as[0] = (char)((short)_x % (short)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_SHORT_PER_B:
+AU_SHORT_PER_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (short)((short)_x % (short)_y);
+	_bs[0] = (short)((short)_x % (short)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_USHORT_PER_A:
+AU_USHORT_PER_A:
 	_as.move_pivot(-1);
-  _as[0] = (ushort) ((ushort) _x % (ushort) _y);
+	_as[0] = (ushort)((ushort)_x % (ushort)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_USHORT_PER_B:
+AU_USHORT_PER_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (ushort) ((ushort) _x % (ushort) _y);
+	_bs[0] = (ushort)((ushort)_x % (ushort)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_INT_PER_A:
+AU_INT_PER_A:
 	_as.move_pivot(-1);
-  _as[0] = (int)((int)_x % (int)_y);
+	_as[0] = (int)((int)_x % (int)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_INT_PER_B:
+AU_INT_PER_B:
 	_bs.move_pivot(-1);
 	_bs[0] = (int)((int)_x % (int)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UINT_PER_A:
+AU_UINT_PER_A:
 	_as.move_pivot(-1);
-  _as[0] =  (uint) ((uint) _x % (uint) _y);
+	_as[0] = (uint)((uint)_x % (uint)_y);
 	++*pc;
 	goto INSTEND;
 
-  AU_UINT_PER_B:
+AU_UINT_PER_B:
 	_bs.move_pivot(-1);
-	_bs[0] = (uint) ((uint) _x % (uint) _y);
+	_bs[0] = (uint)((uint)_x % (uint)_y);
 	++*pc;
 	goto INSTEND;
 
-  LU_BOOL_AND_A:
+LU_BOOL_AND_A:
 	_as.move_pivot(-1);
-  _as[0] = (bool) _x && (bool) _y;
+	_as[0] = (bool)_x && (bool)_y;
 	++*pc;
 	goto INSTEND;
 
-  LU_BOOL_AND_B:
+LU_BOOL_AND_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (bool) _x && (bool) _y;
+	_bs[0] = (bool)_x && (bool)_y;
 	++*pc;
 	goto INSTEND;
 
-  LU_BOOL_OR_A:
+LU_BOOL_OR_A:
 	_as.move_pivot(-1);
-  _as[0] = (bool) _x || (bool) _y;
+	_as[0] = (bool)_x || (bool)_y;
 	++*pc;
 	goto INSTEND;
 
-  LU_BOOL_OR_B:
+LU_BOOL_OR_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (bool) _x || (bool) _y;
+	_bs[0] = (bool)_x || (bool)_y;
 	++*pc;
 	goto INSTEND;
 
-  LU_BOOL_NOT_A:
-  _as.move_pivot(-1);
-  _as[0] = !(bool) _x;
-	++*pc;
-	goto INSTEND;
-
-  LU_BOOL_NOT_B:
-	_bs.move_pivot(-1);
-	_bs[0] =  !(bool) _x;
-	++*pc;
-	goto INSTEND;
-
-  CM_BOOL_SAME_A:
+LU_BOOL_NOT_A:
 	_as.move_pivot(-1);
-  _as[0] =  _x == _y;
+	_as[0] = !(bool)_x;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_SAME_B:
+LU_BOOL_NOT_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  _x == _y;
+	_bs[0] = !(bool)_x;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_NOTSAME_A:
+CM_BOOL_SAME_A:
 	_as.move_pivot(-1);
-  _as[0] =  _x != _y;
+	_as[0] = _x == _y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_NOTSAME_B:
+CM_BOOL_SAME_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  _x != _y;
+	_bs[0] = _x == _y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_BYTE_LBIG_A:
+CM_BOOL_NOTSAME_A:
 	_as.move_pivot(-1);
-  _as[0] =  (char)_x > (char)_y;
+	_as[0] = _x != _y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_BYTE_LBIG_B:
+CM_BOOL_NOTSAME_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (char)_x > (char)_y;
+	_bs[0] = _x != _y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UBYTE_LBIG_A:
+CM_BOOL_BYTE_LBIG_A:
 	_as.move_pivot(-1);
-  _as[0] =  (byte8) _x > (byte8) _y;
+	_as[0] = (char)_x > (char)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UBYTE_LBIG_B:
+CM_BOOL_BYTE_LBIG_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (byte8) _x > (byte8) _y;
+	_bs[0] = (char)_x > (char)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_SHORT_LBIG_A:
+CM_BOOL_UBYTE_LBIG_A:
 	_as.move_pivot(-1);
-  _as[0] =  (short)_x > (short)_y;
+	_as[0] = (byte8)_x > (byte8)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_SHORT_LBIG_B:
+CM_BOOL_UBYTE_LBIG_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (short)_x > (short)_y;
+	_bs[0] = (byte8)_x > (byte8)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_USHORT_LBIG_A:
+CM_BOOL_SHORT_LBIG_A:
 	_as.move_pivot(-1);
-  _as[0] = (ushort) _x > (ushort) _y;
+	_as[0] = (short)_x > (short)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_USHORT_LBIG_B:
+CM_BOOL_SHORT_LBIG_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (ushort) _x > (ushort) _y;
+	_bs[0] = (short)_x > (short)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_INT_LBIG_A:
+CM_BOOL_USHORT_LBIG_A:
 	_as.move_pivot(-1);
-  _as[0] = (int)_x > (int)_y;
+	_as[0] = (ushort)_x > (ushort)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_INT_LBIG_B:
+CM_BOOL_USHORT_LBIG_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (int)_x > (int)_y;
+	_bs[0] = (ushort)_x > (ushort)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UINT_LBIG_A:
+CM_BOOL_INT_LBIG_A:
 	_as.move_pivot(-1);
-  _as[0] =  (uint) _x > (uint) _y;
+	_as[0] = (int)_x > (int)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UINT_LBIG_B:
+CM_BOOL_INT_LBIG_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (uint) _x > (uint) _y;
+	_bs[0] = (int)_x > (int)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_FLOAT_LBIG_A:
+CM_BOOL_UINT_LBIG_A:
 	_as.move_pivot(-1);
-  _as[0] =  (float)_x > (float)_y;
+	_as[0] = (uint)_x > (uint)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_FLOAT_LBIG_B:
+CM_BOOL_UINT_LBIG_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (float)_x > (float)_y;
+	_bs[0] = (uint)_x > (uint)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_BYTE_LBIGSAME_A:
+CM_BOOL_FLOAT_LBIG_A:
 	_as.move_pivot(-1);
-  _as[0] =  (char)_x >= (char)_y;
+	_as[0] = (float)_x > (float)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_BYTE_LBIGSAME_B:
+CM_BOOL_FLOAT_LBIG_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (char)_x >= (char)_y;
+	_bs[0] = (float)_x > (float)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UBYTE_LBIGSAME_A:
+CM_BOOL_BYTE_LBIGSAME_A:
 	_as.move_pivot(-1);
-  _as[0] =  (byte8) _x >= (byte8) _y;
+	_as[0] = (char)_x >= (char)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UBYTE_LBIGSAME_B:
+CM_BOOL_BYTE_LBIGSAME_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (byte8) _x >= (byte8) _y;
+	_bs[0] = (char)_x >= (char)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_SHORT_LBIGSAME_A:
-  _as.move_pivot(-1);
-  _as[0] =  (short)_x >= (short)_y;
+CM_BOOL_UBYTE_LBIGSAME_A:
+	_as.move_pivot(-1);
+	_as[0] = (byte8)_x >= (byte8)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_SHORT_LBIGSAME_B:
+CM_BOOL_UBYTE_LBIGSAME_B:
+	_bs.move_pivot(-1);
+	_bs[0] = (byte8)_x >= (byte8)_y;
+	++*pc;
+	goto INSTEND;
+
+CM_BOOL_SHORT_LBIGSAME_A:
+	_as.move_pivot(-1);
+	_as[0] = (short)_x >= (short)_y;
+	++*pc;
+	goto INSTEND;
+
+CM_BOOL_SHORT_LBIGSAME_B:
 	_bs.move_pivot(-1);
 	_bs[0] = (short)_x >= (short)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_USHORT_LBIGSAME_A:
+CM_BOOL_USHORT_LBIGSAME_A:
 	_as.move_pivot(-1);
-  _as[0] = (ushort) _x >= (ushort) _y;
+	_as[0] = (ushort)_x >= (ushort)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_USHORT_LBIGSAME_B:
+CM_BOOL_USHORT_LBIGSAME_B:
 	_bs.move_pivot(-1);
-	_bs[0] = (ushort) _x >= (ushort) _y;
+	_bs[0] = (ushort)_x >= (ushort)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_INT_LBIGSAME_A:
+CM_BOOL_INT_LBIGSAME_A:
 	_as.move_pivot(-1);
-  _as[0] = (int)_x >= (int)_y;
+	_as[0] = (int)_x >= (int)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_INT_LBIGSAME_B:
+CM_BOOL_INT_LBIGSAME_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (int)_x >= (int)_y;
+	_bs[0] = (int)_x >= (int)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UINT_LBIGSAME_A:
+CM_BOOL_UINT_LBIGSAME_A:
 	_as.move_pivot(-1);
-  _as[0] = (uint) _x >= (uint) _y;
+	_as[0] = (uint)_x >= (uint)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UINT_LBIGSAME_B:
+CM_BOOL_UINT_LBIGSAME_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (uint) _x >= (uint) _y;
+	_bs[0] = (uint)_x >= (uint)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_FLOAT_LBIGSAME_A:
+CM_BOOL_FLOAT_LBIGSAME_A:
 	_as.move_pivot(-1);
-  _as[0] = (float)_x >= (float)_y;
+	_as[0] = (float)_x >= (float)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_FLOAT_LBIGSAME_B:
+CM_BOOL_FLOAT_LBIGSAME_B:
 	_bs.move_pivot(-1);
 	_bs[0] = (float)_x >= (float)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_BYTE_RBIG_A:
+CM_BOOL_BYTE_RBIG_A:
 	_as.move_pivot(-1);
-  _as[0] = (char)_x < (char)_y;
+	_as[0] = (char)_x < (char)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_BYTE_RBIG_B:
+CM_BOOL_BYTE_RBIG_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (char)_x < (char)_y;
+	_bs[0] = (char)_x < (char)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UBYTE_RBIG_A:
+CM_BOOL_UBYTE_RBIG_A:
 	_as.move_pivot(-1);
-  _as[0] =  (byte8) _x < (byte8) _y;
+	_as[0] = (byte8)_x < (byte8)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UBYTE_RBIG_B:
+CM_BOOL_UBYTE_RBIG_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (byte8) _x < (byte8) _y;
+	_bs[0] = (byte8)_x < (byte8)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_SHORT_RBIG_A:
+CM_BOOL_SHORT_RBIG_A:
 	_as.move_pivot(-1);
-  _as[0] = (short)_x < (short)_y;
+	_as[0] = (short)_x < (short)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_SHORT_RBIG_B:
+CM_BOOL_SHORT_RBIG_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (short)_x < (short)_y;
+	_bs[0] = (short)_x < (short)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_USHORT_RBIG_A:
+CM_BOOL_USHORT_RBIG_A:
 	_as.move_pivot(-1);
-  _as[0] =  (ushort) _x < (ushort) _y;
+	_as[0] = (ushort)_x < (ushort)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_USHORT_RBIG_B:
+CM_BOOL_USHORT_RBIG_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (ushort) _x < (ushort) _y;
+	_bs[0] = (ushort)_x < (ushort)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_INT_RBIG_A:
+CM_BOOL_INT_RBIG_A:
 	_as.move_pivot(-1);
-  _as[0] = (int)_x < (int)_y;
+	_as[0] = (int)_x < (int)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_INT_RBIG_B:
+CM_BOOL_INT_RBIG_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (int)_x < (int)_y;
+	_bs[0] = (int)_x < (int)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UINT_RBIG_A:
+CM_BOOL_UINT_RBIG_A:
 	_as.move_pivot(-1);
-  _as[0] =  (uint) _x < (uint) _y;
+	_as[0] = (uint)_x < (uint)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UINT_RBIG_B:
+CM_BOOL_UINT_RBIG_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (uint) _x < (uint) _y;
+	_bs[0] = (uint)_x < (uint)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_FLOAT_RBIG_A:
+CM_BOOL_FLOAT_RBIG_A:
 	_as.move_pivot(-1);
-  _as[0] =  (float)_x < (float)_y;
+	_as[0] = (float)_x < (float)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_FLOAT_RBIG_B:
+CM_BOOL_FLOAT_RBIG_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (float)_x < (float)_y;
+	_bs[0] = (float)_x < (float)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_BYTE_RBIGSAME_A:
+CM_BOOL_BYTE_RBIGSAME_A:
 	_as.move_pivot(-1);
-  _as[0] =  (char)_x <= (char)_y;
+	_as[0] = (char)_x <= (char)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_BYTE_RBIGSAME_B:
+CM_BOOL_BYTE_RBIGSAME_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (char)_x <= (char)_y;
+	_bs[0] = (char)_x <= (char)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UBYTE_RBIGSAME_A:
+CM_BOOL_UBYTE_RBIGSAME_A:
 	_as.move_pivot(-1);
-  _as[0] =  (byte8) _x <= (byte8) _y;
+	_as[0] = (byte8)_x <= (byte8)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UBYTE_RBIGSAME_B:
+CM_BOOL_UBYTE_RBIGSAME_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (byte8) _x <= (byte8) _y;
+	_bs[0] = (byte8)_x <= (byte8)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_SHORT_RBIGSAME_A:
+CM_BOOL_SHORT_RBIGSAME_A:
 	_as.move_pivot(-1);
-  _as[0] = (short)_x <= (short)_y;
+	_as[0] = (short)_x <= (short)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_SHORT_RBIGSAME_B:
+CM_BOOL_SHORT_RBIGSAME_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (short)_x <= (short)_y;
+	_bs[0] = (short)_x <= (short)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_USHORT_RBIGSAME_A:
+CM_BOOL_USHORT_RBIGSAME_A:
 	_as.move_pivot(-1);
-  _as[0] = (ushort) _x <= (ushort) _y;
+	_as[0] = (ushort)_x <= (ushort)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_USHORT_RBIGSAME_B:
+CM_BOOL_USHORT_RBIGSAME_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (ushort) _x <= (ushort) _y;
+	_bs[0] = (ushort)_x <= (ushort)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_INT_RBIGSAME_A:
+CM_BOOL_INT_RBIGSAME_A:
 	_as.move_pivot(-1);
-  _as[0] =  (int)_x <= (int)_y;
+	_as[0] = (int)_x <= (int)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_INT_RBIGSAME_B:
+CM_BOOL_INT_RBIGSAME_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (int)_x <= (int)_y;
+	_bs[0] = (int)_x <= (int)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UINT_RBIGSAME_A:
+CM_BOOL_UINT_RBIGSAME_A:
 	_as.move_pivot(-1);
-  _as[0] = (uint) _x <= (uint) _y;
+	_as[0] = (uint)_x <= (uint)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_UINT_RBIGSAME_B:
+CM_BOOL_UINT_RBIGSAME_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (uint) _x <= (uint) _y;
+	_bs[0] = (uint)_x <= (uint)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_FLOAT_RBIGSAME_A:
+CM_BOOL_FLOAT_RBIGSAME_A:
 	_as.move_pivot(-1);
-  _as[0] = (float)_x <= (float)_y;
+	_as[0] = (float)_x <= (float)_y;
 	++*pc;
 	goto INSTEND;
 
-  CM_BOOL_FLOAT_RBIGSAME_B:
+CM_BOOL_FLOAT_RBIGSAME_B:
 	_bs.move_pivot(-1);
-	_bs[0] =  (float)_x <= (float)_y;
+	_bs[0] = (float)_x <= (float)_y;
 	++*pc;
 	goto INSTEND;
 
-
-  IF:
+IF:
 	++*pc;
 	tmptr_i = *pci;
 	++*pci;
-	if (!(bool) _as[0])
+	if (!(bool)_as[0])
 		*pc = &mem[*tmptr_i];
 	goto INSTEND;
 
-  JMP:
+JMP:
 	++*pc;
 	tmptr_i = *pci;
 	++*pci;
 	*pc = &mem[*tmptr_i];
 	goto INSTEND;
 
-  FUNC:
+FUNC:
 	*lfsp = *rfsp;
 	fsp->push_back(--*sp);
 	*rfsp = fsp->last();
@@ -5758,25 +5725,25 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	// *pc = &mem[*++*pci];
 	goto INSTEND;
 
-  PARAM_1:
-	**sp = (byte8) _as[0];
+PARAM_1:
+	**sp = (byte8)_as[0];
 	--*sp;
 	++*pc;
 	goto INSTEND;
 
-  PARAM_2:
-	**sps = (ushort) _as[0];
+PARAM_2:
+	**sps = (ushort)_as[0];
 	--*sps;
 	++*pc;
 	goto INSTEND;
 
-  PARAM_4:
+PARAM_4:
 	--*spi;
-	**spi = (uint) _as[0];
+	**spi = (uint)_as[0];
 	++*pc;
 	goto INSTEND;
 
-  RETURN:
+RETURN:
 	*sp = *rfsp;
 	*rfsp = *lfsp;
 	fsp->pop_back();
@@ -5785,354 +5752,354 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 	++*pc;
 	goto INSTEND;
 
-  EXIT:
+EXIT:
 	++*pc;
 	goto PROGRAMQUIT;
 
-  WAIT:
+WAIT:
 	++*pc;
 	goto INSTEND;
 
-  SET_A_VARIABLE_ADDRESS:
+SET_A_VARIABLE_ADDRESS:
 	++*pc;
 	_as.move_pivot(-1);
-  _as[0] = (*rfsp - **pci) - mem;
+	_as[0] = (*rfsp - **pci) - mem;
 	++*pci;
 	goto INSTEND;
 
-  SET_B_VARIABLE_ADDRESS:
+SET_B_VARIABLE_ADDRESS:
 	++*pc;
 	_bs.move_pivot(-1);
-  _bs[0] = (*rfsp - **pci) - mem;
+	_bs[0] = (*rfsp - **pci) - mem;
 	++*pci;
 	goto INSTEND;
 
-  SET_X_VARIABLE_ADDRESS:
+SET_X_VARIABLE_ADDRESS:
 	++*pc;
 	_x = (*rfsp - **pci) - mem;
 	++*pci;
 	goto INSTEND;
 
-  SET_Y_VARIABLE_ADDRESS:
+SET_Y_VARIABLE_ADDRESS:
 	++*pc;
 	_y = (*rfsp - **pci) - mem;
 	++*pci;
 	goto INSTEND;
 
-  SET_LA_FROM_A:
+SET_LA_FROM_A:
 	_la = _as[0];
 	_as.move_pivot(1);
 	++*pc;
 	goto INSTEND;
 
-  FUNCJMP:
+FUNCJMP:
 	++*pc;
 	tmptr_i = *pci;
 	++*pci;
-	call_stack->push_back(*pc-1);
+	call_stack->push_back(*pc - 1);
 	*pc = &mem[*tmptr_i];
 	goto INSTEND;
 
-  CASTEND_A:
+CASTEND_A:
 	//_as.move_pivot(-1);
-  _as[0] = casting_value;
+	_as[0] = casting_value;
 	++*pc;
 	goto INSTEND;
 
-  CASTEND_B:
+CASTEND_B:
 	//_bs.move_pivot(-1);
 	_bs[0] = casting_value;
 	++*pc;
 	goto INSTEND;
 
-  CASTEND_X:
+CASTEND_X:
 	_x = casting_value;
 	++*pc;
 	goto INSTEND;
 
-  CASTEND_Y:
+CASTEND_Y:
 	_y = casting_value;
 	++*pc;
 	goto INSTEND;
 
-  CASTING_A:
+CASTING_A:
 	castend_label = &&CASTEND_A;
 	casting_value = _as[0];
 	goto *cast[*++*pc];
 
-  CASTING_B:
+CASTING_B:
 	castend_label = &&CASTEND_B;
-    casting_value = _bs[0];
+	casting_value = _bs[0];
 	goto *cast[*++*pc];
 
-  CASTING_X:
+CASTING_X:
 	castend_label = &&CASTEND_X;
 	casting_value = _x;
 	goto *cast[*++*pc];
 
-  CASTING_Y:
+CASTING_Y:
 	castend_label = &&CASTEND_Y;
 	casting_value = _y;
 	goto *cast[*++*pc];
 
 	// CASTING TYPES
-  CAST_BYTE_TO_SHORT:
-	casting_value = (short)*reinterpret_cast < char *>(&casting_value);
+CAST_BYTE_TO_SHORT:
+	casting_value = (short)*reinterpret_cast<char *>(&casting_value);
 	goto *castend_label;
 
-  CAST_BYTE_TO_USHORT:
-	casting_value = (ushort) * reinterpret_cast < char *>(&casting_value);
+CAST_BYTE_TO_USHORT:
+	casting_value = (ushort) * reinterpret_cast<char *>(&casting_value);
 	goto *castend_label;
 
-  CAST_BYTE_TO_INT:
-	casting_value = (int)*reinterpret_cast < char *>(&casting_value);
+CAST_BYTE_TO_INT:
+	casting_value = (int)*reinterpret_cast<char *>(&casting_value);
 	goto *castend_label;
 
-  CAST_BYTE_TO_UINT:
-	casting_value = (uint) * reinterpret_cast < char *>(&casting_value);
+CAST_BYTE_TO_UINT:
+	casting_value = (uint) * reinterpret_cast<char *>(&casting_value);
 	goto *castend_label;
 
-  CAST_BYTE_TO_FLOAT:
-	casting_value = (float)*reinterpret_cast < char *>(&casting_value);
+CAST_BYTE_TO_FLOAT:
+	casting_value = (float)*reinterpret_cast<char *>(&casting_value);
 	goto *castend_label;
 
-  CAST_UBYTE_TO_FLOAT:
-	casting_value = (float)*reinterpret_cast < byte8 * >(&casting_value);
+CAST_UBYTE_TO_FLOAT:
+	casting_value = (float)*reinterpret_cast<byte8 *>(&casting_value);
 	goto *castend_label;
 
-  CAST_SHORT_TO_BYTE:
-	casting_value = (char)*reinterpret_cast < short *>(&casting_value);
+CAST_SHORT_TO_BYTE:
+	casting_value = (char)*reinterpret_cast<short *>(&casting_value);
 	goto *castend_label;
 
-  CAST_SHORT_TO_INT:
-	casting_value = (int)*reinterpret_cast < short *>(&casting_value);
+CAST_SHORT_TO_INT:
+	casting_value = (int)*reinterpret_cast<short *>(&casting_value);
 	goto *castend_label;
 
-  CAST_SHORT_TO_FLOAT:
-	casting_value = (float)*reinterpret_cast < short *>(&casting_value);
+CAST_SHORT_TO_FLOAT:
+	casting_value = (float)*reinterpret_cast<short *>(&casting_value);
 	goto *castend_label;
 
-  CAST_USHORT_TO_FLOAT:
-	casting_value = (float)*reinterpret_cast < ushort * >(&casting_value);
+CAST_USHORT_TO_FLOAT:
+	casting_value = (float)*reinterpret_cast<ushort *>(&casting_value);
 	goto *castend_label;
 
-  CAST_INT_TO_BYTE:
-	casting_value = (char)*reinterpret_cast < int *>(&casting_value);
+CAST_INT_TO_BYTE:
+	casting_value = (char)*reinterpret_cast<int *>(&casting_value);
 	goto *castend_label;
 
-  CAST_INT_TO_SHORT:
-	casting_value = (short)*reinterpret_cast < int *>(&casting_value);
+CAST_INT_TO_SHORT:
+	casting_value = (short)*reinterpret_cast<int *>(&casting_value);
 	goto *castend_label;
 
-  CAST_INT_TO_FLOAT:
-	casting_value = (float)*reinterpret_cast < int *>(&casting_value);
+CAST_INT_TO_FLOAT:
+	casting_value = (float)*reinterpret_cast<int *>(&casting_value);
 	goto *castend_label;
 
-  CAST_UINT_TO_FLOAT:
-	casting_value = (float)*reinterpret_cast < uint * >(&casting_value);
+CAST_UINT_TO_FLOAT:
+	casting_value = (float)*reinterpret_cast<uint *>(&casting_value);
 	goto *castend_label;
 
-  CAST_FLOAT_TO_BYTE:
-	casting_value = (char)*reinterpret_cast < float *>(&casting_value);
+CAST_FLOAT_TO_BYTE:
+	casting_value = (char)*reinterpret_cast<float *>(&casting_value);
 	goto *castend_label;
 
-  CAST_FLOAT_TO_UBYTE:
-	casting_value = (byte8) * reinterpret_cast < float *>(&casting_value);
+CAST_FLOAT_TO_UBYTE:
+	casting_value = (byte8) * reinterpret_cast<float *>(&casting_value);
 	goto *castend_label;
 
-  CAST_FLOAT_TO_SHORT:
-	casting_value = (short)*reinterpret_cast < float *>(&casting_value);
+CAST_FLOAT_TO_SHORT:
+	casting_value = (short)*reinterpret_cast<float *>(&casting_value);
 	goto *castend_label;
 
-  CAST_FLOAT_TO_USHORT:
-	casting_value = (ushort) * reinterpret_cast < float *>(&casting_value);
+CAST_FLOAT_TO_USHORT:
+	casting_value = (ushort) * reinterpret_cast<float *>(&casting_value);
 	goto *castend_label;
 
-  CAST_FLOAT_TO_INT:
-	casting_value = (int)*reinterpret_cast < float *>(&casting_value);
+CAST_FLOAT_TO_INT:
+	casting_value = (int)*reinterpret_cast<float *>(&casting_value);
 	goto *castend_label;
 
-  CAST_FLOAT_TO_UINT:
-	casting_value = (uint) * reinterpret_cast < float *>(&casting_value);
+CAST_FLOAT_TO_UINT:
+	casting_value = (uint) * reinterpret_cast<float *>(&casting_value);
 	goto *castend_label;
 
-  GET_VALUE_A:
-  _as[0] = *reinterpret_cast < uint * >(&mem[_as[0]]);
+GET_VALUE_A:
+	_as[0] = *reinterpret_cast<uint *>(&mem[_as[0]]);
 	++*pc;
 	goto INSTEND;
 
-  GET_VALUE_B:
-	_bs[0] = *reinterpret_cast < uint * >(&mem[_bs[0]]);
+GET_VALUE_B:
+	_bs[0] = *reinterpret_cast<uint *>(&mem[_bs[0]]);
 	++*pc;
 	goto INSTEND;
 
-  GET_VALUE_X:
-	_x = *reinterpret_cast < uint * >(&mem[_x]);
+GET_VALUE_X:
+	_x = *reinterpret_cast<uint *>(&mem[_x]);
 	++*pc;
 	goto INSTEND;
 
-  GET_VALUE_Y:
-	_y = *reinterpret_cast < uint * >(&mem[_y]);
+GET_VALUE_Y:
+	_y = *reinterpret_cast<uint *>(&mem[_y]);
 	++*pc;
 	goto INSTEND;
 
-  DBG_A:
+DBG_A:
 	goto *dbgt[*++*pc];
-  DBG_END:
+DBG_END:
 	++*pc;
 	goto INSTEND;
 
-  DBG_A_BYTE:
+DBG_A_BYTE:
 	printf("%c", (char)_as[0]);
 	goto DBG_END;
 
-  DBG_A_UBYTE:
-	printf("%d", (byte8) _as[0]);
+DBG_A_UBYTE:
+	printf("%d", (byte8)_as[0]);
 	goto DBG_END;
 
-  DBG_A_SHORT:
+DBG_A_SHORT:
 	printf("%d", (short)_as[0]);
 	goto DBG_END;
 
-  DBG_A_USHORT:
-	printf("%d", (ushort) _as[0]);
+DBG_A_USHORT:
+	printf("%d", (ushort)_as[0]);
 	goto DBG_END;
 
-  DBG_A_INT:
+DBG_A_INT:
 	printf("%d", (int)_as[0]);
 	goto DBG_END;
 
-  DBG_A_UINT:
-	printf("%d", (uint) _as[0]);
+DBG_A_UINT:
+	printf("%d", (uint)_as[0]);
 	goto DBG_END;
 
-  DBG_A_BOOL:
-	printf((bool) _as[0] ? "true" : "false");
+DBG_A_BOOL:
+	printf((bool)_as[0] ? "true" : "false");
 	goto DBG_END;
 
-  DBG_A_FLOAT:
+DBG_A_FLOAT:
 	printf("%g", (float)_as[0]);
 	goto DBG_END;
 
-  DBG_A_STRING:
-	printf("%s", reinterpret_cast < char *>(&mem[_as[0]]));
+DBG_A_STRING:
+	printf("%s", reinterpret_cast<char *>(&mem[_as[0]]));
 	goto DBG_END;
 
-  INP_A_PTR:
+INP_A_PTR:
 	goto *inpt[*++*pc];
-  INP_A_END:
+INP_A_END:
 	++*pc;
 	goto INSTEND;
 
-  INP_BYTE:
-	scanf("%c", reinterpret_cast < char *>(&mem[_as[0]]));
+INP_BYTE:
+	scanf("%c", reinterpret_cast<char *>(&mem[_as[0]]));
 	goto INP_A_END;
 
-  INP_UBYTE:
+INP_UBYTE:
+{
+	unsigned int in;
+	scanf("%u", &in);
+	*reinterpret_cast<byte8 *>(&mem[_as[0]]) = (byte8)in;
+}
+	goto INP_A_END;
+
+INP_SHORT:
+{
+	int in;
+	scanf("%d", &in);
+	*reinterpret_cast<short *>(&mem[_as[0]]) = (short)in;
+}
+	goto INP_A_END;
+
+INP_USHORT:
+{
+	unsigned int in;
+	scanf("%u", &in);
+	*reinterpret_cast<ushort *>(&mem[_as[0]]) = (ushort)in;
+}
+	goto INP_A_END;
+
+INP_INT:
+	scanf("%d", reinterpret_cast<int *>(&mem[_as[0]]));
+	goto INP_A_END;
+
+INP_UINT:
+	scanf("%u", reinterpret_cast<uint *>(&mem[_as[0]]));
+	goto INP_A_END;
+
+INP_FLOAT:
+	scanf("%f", reinterpret_cast<float *>(&mem[_as[0]]));
+	goto INP_A_END;
+
+INP_BOOL:
+{
+	char str[8] = {};
+	scanf("%s", str);
+	if (strcmp(str, "true"))
 	{
-		unsigned int in;
-		scanf("%u", &in);
-		*reinterpret_cast < byte8 * >(&mem[_as[0]]) = (byte8) in;
+		*reinterpret_cast<bool *>(&mem[_as[0]]) = true;
 	}
-	goto INP_A_END;
-
-  INP_SHORT:
+	else
 	{
-		int in;
-		scanf("%d", &in);
-		*reinterpret_cast < short *>(&mem[_as[0]]) = (short)in;
+		*reinterpret_cast<bool *>(&mem[_as[0]]) = false;
 	}
+}
 	goto INP_A_END;
 
-  INP_USHORT:
-	{
-		unsigned int in;
-		scanf("%u", &in);
-		*reinterpret_cast < ushort * >(&mem[_as[0]]) = (ushort) in;
-	}
+INP_STRING:
+	scanf("%s", reinterpret_cast<char *>(&mem[_as[0]]));
 	goto INP_A_END;
 
-  INP_INT:
-	scanf("%d", reinterpret_cast < int *>(&mem[_as[0]]));
-	goto INP_A_END;
-
-  INP_UINT:
-	scanf("%u", reinterpret_cast < uint * >(&mem[_as[0]]));
-	goto INP_A_END;
-
-  INP_FLOAT:
-	scanf("%f", reinterpret_cast < float *>(&mem[_as[0]]));
-	goto INP_A_END;
-
-  INP_BOOL:
-	{
-		char str[8] = { };
-		scanf("%s", str);
-		if (strcmp(str, "true"))
-		{
-			*reinterpret_cast < bool * >(&mem[_as[0]]) = true;
-		}
-		else
-		{
-			*reinterpret_cast < bool * >(&mem[_as[0]]) = false;
-		}
-	}
-	goto INP_A_END;
-
-  INP_STRING:
-	scanf("%s", reinterpret_cast < char *>(&mem[_as[0]]));
-	goto INP_A_END;
-
-  SET_ADDRESS_LA_FROM_A_1:
+SET_ADDRESS_LA_FROM_A_1:
 	mem[_la] = _as[0];
 	++*pc;
 	goto INSTEND;
 
-  SET_ADDRESS_LA_FROM_A_2:
-	*reinterpret_cast < ushort * >(&mem[_la]) = _as[0];
+SET_ADDRESS_LA_FROM_A_2:
+	*reinterpret_cast<ushort *>(&mem[_la]) = _as[0];
 	++*pc;
 	goto INSTEND;
 
-  SET_ADDRESS_LA_FROM_A_4:
-	*reinterpret_cast < uint * >(&mem[_la]) = _as[0];
+SET_ADDRESS_LA_FROM_A_4:
+	*reinterpret_cast<uint *>(&mem[_la]) = _as[0];
 	++*pc;
 	goto INSTEND;
 
-  SET_A_CONST_STRING:
+SET_A_CONST_STRING:
 	++*pc;
-	strmax = *reinterpret_cast < uint * >(*pci);
+	strmax = *reinterpret_cast<uint *>(*pci);
 	++*pci;
 	_as.move_pivot(-1);
-	_as[0] =  reinterpret_cast < uint64_t > (++*pc);
-	*pc += strmax-1;
+	_as[0] = reinterpret_cast<uint64_t>(++*pc);
+	*pc += strmax - 1;
 	goto INSTEND;
 
-  SET_B_CONST_STRING:
+SET_B_CONST_STRING:
 	++*pc;
-	strmax = *reinterpret_cast < uint * >(*pci);
+	strmax = *reinterpret_cast<uint *>(*pci);
 	++*pci;
 	_bs.move_pivot(-1);
-	_bs[0] =  reinterpret_cast < uint64_t > (++*pc);
-	*pc += strmax-1;
+	_bs[0] = reinterpret_cast<uint64_t>(++*pc);
+	*pc += strmax - 1;
 	goto INSTEND;
-	
-	POP_A:
+
+POP_A:
 	_as.move_pivot(1);
 	++*pc;
 	goto INSTEND;
-	
-	POP_B:
+
+POP_B:
 	_bs.move_pivot(1);
 	++*pc;
 	goto INSTEND;
-	
-	POP_AB:
+
+POP_AB:
 	_as.move_pivot(1);
 	_bs.move_pivot(1);
 	++*pc;
 	goto INSTEND;
 
-  INST_INIT:
+INST_INIT:
 	for (int k = 0; k < icbarr.size(); ++k)
 	{
 		cast = icbarr[k]->cast;
@@ -6389,7 +6356,7 @@ void execute(vecarr < InsideCode_Bake * >icbarr, int execodenum,
 
 		inst[i++] = &&SET_A_CONST_STRING;
 		inst[i++] = &&SET_B_CONST_STRING;
-		
+
 		inst[i++] = &&POP_A;
 		inst[i++] = &&POP_B;
 		inst[i++] = &&POP_AB;
@@ -6458,7 +6425,7 @@ int main()
 	icb.init();
 	icb.bake_code("code.txt");
 
-	vecarr < InsideCode_Bake * >exeicbs;
+	vecarr<InsideCode_Bake *> exeicbs;
 	exeicbs.NULLState();
 	exeicbs.Init(2, false);
 	exeicbs.push_back(&icb);
