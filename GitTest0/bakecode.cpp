@@ -228,12 +228,13 @@ TBT DecodeTextBlock(lcstr & t)
 	}
 }
 
-lcstr GetCodeTXT(const char *filename)
+lcstr* GetCodeTXT(const char *filename)
 {
 	FILE *fp = fopen(filename, "rt");
 	if (fp)
 	{
-		lcstr codetxt;
+		lcstr* codetxt = (lcstr*)fm->_New(sizeof(lcstr), true);
+		codetxt->Init(10, false);
 		int max = 0;
 		fseek(fp, 0, SEEK_END);
 		max = ftell(fp);
@@ -257,7 +258,7 @@ lcstr GetCodeTXT(const char *filename)
 
 			if (stack == 2)
 			{
-				codetxt.pop_back();
+				codetxt->pop_back();
 				int mm = 0;
 				while (c != '\n' && k + mm < max)
 				{
@@ -267,7 +268,7 @@ lcstr GetCodeTXT(const char *filename)
 				max -= mm + 1;
 				continue;
 			}
-			codetxt.push_back(c);
+			codetxt->push_back(c);
 			k++;
 		}
 		return codetxt;
@@ -275,6 +276,7 @@ lcstr GetCodeTXT(const char *filename)
 	else
 	{
 		printf("[ERROR] : file is nor exist.", filename);
+		return nullptr;
 	}
 }
 
@@ -4284,8 +4286,7 @@ class InsideCode_Bake
 
 	void bake_code(const char *filename)
 	{
-		lcstr allcode;
-		allcode = GetCodeTXT(filename);
+		lcstr& allcode = GetCodeTXT(filename);
 		AddTextBlocks(allcode);
 
 		for (int i = 0; i < allcode_sen.size(); ++i)
