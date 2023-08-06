@@ -4286,7 +4286,8 @@ class InsideCode_Bake
 
 	void bake_code(const char *filename)
 	{
-		lcstr& allcode = GetCodeTXT(filename);
+		lcstr* allcodeptr = GetCodeTXT(filename);
+		lcstr& allcode = *allcodeptr;
 		AddTextBlocks(allcode);
 
 		for (int i = 0; i < allcode_sen.size(); ++i)
