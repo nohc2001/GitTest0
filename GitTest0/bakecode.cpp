@@ -228,7 +228,7 @@ TBT DecodeTextBlock(lcstr & t)
 	}
 }
 
-lcstr* GetCodeTXT(const char *filename)
+lcstr* GetCodeTXT(const char *filename, FM_System0* fm)
 {
 	FILE *fp = fopen(filename, "rt");
 	if (fp)
@@ -2064,7 +2064,13 @@ class InsideCode_Bake
 		}
 		for (int i = 1; i < tname->size(); ++i)
 		{
-			if (tname->at(i).data.str[0] == '*')
+			char c = 0;
+			if(tname->at(i).data.str != nullptr)
+			{
+				cout << (int*)tname->at(i).data.str << endl; 
+				c = tname->at(i).data.str[0];
+			}
+			if (c == '*')
 			{
 				ntd = get_addpointer_type(td);
 				if (i != 1)
@@ -2073,7 +2079,7 @@ class InsideCode_Bake
 				}
 				td = ntd;
 			}
-			else if (tname->at(i).data.str[0] == '[')
+			else if (c == '[')
 			{
 				int siz = atoi(tname->at(i + 1).data.str);
 				// get array type with siz
@@ -4222,8 +4228,8 @@ class InsideCode_Bake
 			}
 
 			sen *code2 = get_sen_from_codesen(cs0);
-			// wbss.dbg_sen(code);
-			int loc2 = code->up - 1;
+			wbss.dbg_sen(code2);
+			int loc2 = code2->up - 1;
 			char *variable_name = code2->at(loc2).data.str;
 			sen *type_name = wbss.sen_cut(code2, 0, loc2 - 1);
 			type_data *td = get_type_with_namesen(type_name);
@@ -4286,7 +4292,7 @@ class InsideCode_Bake
 
 	void bake_code(const char *filename)
 	{
-		lcstr* allcodeptr = GetCodeTXT(filename);
+		lcstr* allcodeptr = GetCodeTXT(filename, fm);
 		lcstr& allcode = *allcodeptr;
 		AddTextBlocks(allcode);
 
