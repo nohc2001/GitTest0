@@ -60,7 +60,7 @@ void print_board(){
 			if(board[i][k] == 0){
 				dbg('_');
 			}
-			else if(board[i][k] >0){
+			else if(board[i][k] > 0){
 				dbg('o');
 			}
 			else{

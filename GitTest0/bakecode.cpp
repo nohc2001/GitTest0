@@ -766,6 +766,12 @@ public:
 		return nullptr;
 	}
 
+	bool isArrayType(type_data* td){
+		if(td == nullptr) return false;
+		if(td->typetype == 'a') return true;
+		else return false;
+	}
+
 	int get_int_with_basictype(type_data *td)
 	{
 		if (td == basictype[1])
@@ -925,6 +931,15 @@ public:
 		for (byte8 *ptr = sp; ptr != &mem[max_mem_byte - 1]; ++ptr)
 		{
 			cout << (int)*ptr << ' ';
+		}
+		cout << endl;
+	}
+
+	void dbg_data(){
+		cout << "data mem" << endl;
+		for (int i=0;i<datamem.size();++i)
+		{
+			cout << (int)datamem[i] << ' ';
 		}
 		cout << endl;
 	}
@@ -2862,15 +2877,25 @@ public:
 							{
 							case '[':
 							{
+								//there is two arr[i] operation. 
+								//case 1. type is array : it return value of (self's address + i) address.
+								//case 2. type is pointer : it return value of (self's value + i) address.
+
 								temp_mem *result_ten =
 									(temp_mem *)fm->_New(sizeof(temp_mem), true);
 								temp_mem *left_ten = nullptr;
 								temp_mem *right_ten = nullptr;
 								wbss.dbg_sen(segs.at(i - 1));
+								
+								if(isArrayType(left_ten->valuetype_detail)){
+									//case 1 : array type
+								}
+								else{
+									//case 2 : pointer type
+								}
 								left_ten = get_asm_from_sen(segs.at(i - 1), true, true);
 								right_ten = get_asm_from_sen(segs.at(i + 1), true, true);
 								
-
 								result_ten->memsiz = left_ten->memsiz + right_ten->memsiz + 9;
 								result_ten->mem.NULLState();
 								result_ten->mem.Init(result_ten->memsiz + 1, false);
@@ -4313,6 +4338,7 @@ public:
 			dbg_codesen(cs);
 		}
 		datamem.Init(gs + 8, false);
+		datamem.up = gs;
 		dataptr = datamem.Arr - mem;
 
 		mem[writeup++] = 189; // func
@@ -4339,21 +4365,21 @@ vecarr<InsideCode_Bake *> icbarr;
 int code_control(vecarr<InsideCode_Bake *> *icbarr)
 {
 	static int stack = 0;
-	/*
+	
 	for (int i = 0; i < icbarr->size(); ++i)
 	{
 		//cout << "thread[ " << i << " ] next instruction" << endl;
 		icbarr->at(i)->dbg_pc();
 		icbarr->at(i)->dbg_stack();
+		icbarr->at(i)->dbg_data();
 		icbarr->at(i)->dbg_registers();
 	}
-	*/
 
 	char c = 1;
 	stack++;
 	if (stack >= 1)
 	{
-		//scanf("%c", &c);
+		scanf("%c", &c);
 		stack = 0;
 	}
 	switch (c)
@@ -6442,5 +6468,5 @@ int main()
 	exeicbs.NULLState();
 	exeicbs.Init(2, false);
 	exeicbs.push_back(&icb);
-	execute(exeicbs, 10000, code_control, true);
+	execute(exeicbs, 1, code_control, true);
 }
