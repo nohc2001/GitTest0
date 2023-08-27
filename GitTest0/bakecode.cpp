@@ -4327,6 +4327,7 @@ vecarr<InsideCode_Bake *> icbarr;
 int code_control(vecarr<InsideCode_Bake *> *icbarr)
 {
 	static int stack = 0;
+	/*
 	for (int i = 0; i < icbarr->size(); ++i)
 	{
 		//cout << "thread[ " << i << " ] next instruction" << endl;
@@ -4334,6 +4335,7 @@ int code_control(vecarr<InsideCode_Bake *> *icbarr)
 		icbarr->at(i)->dbg_stack();
 		icbarr->at(i)->dbg_registers();
 	}
+	*/
 
 	char c = 1;
 	stack++;
@@ -6069,8 +6071,8 @@ SET_A_CONST_STRING:
 	strmax = *reinterpret_cast<uint *>(*pci);
 	++*pci;
 	_as.move_pivot(-1);
-	_as[0] = reinterpret_cast<uint64_t>(++*pc);
-	*pc += strmax - 1;
+	_as[0] = reinterpret_cast<uint64_t>(*pc);
+	*pc += strmax;
 	goto INSTEND;
 
 SET_B_CONST_STRING:
@@ -6078,8 +6080,8 @@ SET_B_CONST_STRING:
 	strmax = *reinterpret_cast<uint *>(*pci);
 	++*pci;
 	_bs.move_pivot(-1);
-	_bs[0] = reinterpret_cast<uint64_t>(++*pc);
-	*pc += strmax - 1;
+	_bs[0] = reinterpret_cast<uint64_t>(*pc);
+	*pc += strmax;
 	goto INSTEND;
 
 POP_A:
