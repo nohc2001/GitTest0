@@ -2885,15 +2885,17 @@ public:
 									(temp_mem *)fm->_New(sizeof(temp_mem), true);
 								temp_mem *left_ten = nullptr;
 								temp_mem *right_ten = nullptr;
-								wbss.dbg_sen(segs.at(i - 1));
-								
-								if(isArrayType(left_ten->valuetype_detail)){
+
+								bool is_array_type = segs[i]->at(0).type == 'a' && reinterpret_cast<temp_mem*>(segs[i]->at(0).data.str)->valuetype_detail->typetype == 'a';
+								is_array_type |= segs[i]->size() == 1 && get_type_with_vname(segs[i]->at(0).data.str)->typetype == 'a';
+								if(is_array_type){
 									//case 1 : array type
+									left_ten = get_asm_from_sen(segs.at(i - 1), true, false);
 								}
 								else{
 									//case 2 : pointer type
+									left_ten = get_asm_from_sen(segs.at(i - 1), true, true);
 								}
-								left_ten = get_asm_from_sen(segs.at(i - 1), true, true);
 								right_ten = get_asm_from_sen(segs.at(i + 1), true, true);
 								
 								result_ten->memsiz = left_ten->memsiz + right_ten->memsiz + 9;
@@ -2906,10 +2908,22 @@ public:
 								}
 
 								type_data *td = get_sub_type(left_ten->valuetype_detail);
+								type_data *std = nullptr;
+								if(is_array_type){
+									std = get_sub_type(td);
+								}
+								else{
+									std = nullptr;
+								}
 								//type_data *std = get_sub_type(td);
 								result_ten->mem.push_back(27); // b=const4
 								char cc[4] = {};
-								*reinterpret_cast<uint *>(cc) = td->typesiz;
+								if(is_array_type){
+									*reinterpret_cast<uint *>(cc) = std->typesiz;
+								}
+								else{
+									*reinterpret_cast<uint *>(cc) = td->typesiz;
+								}
 								for (int u = 0; u < 4; ++u)
 									result_ten->mem.push_back(cc[u]);
 
@@ -2936,20 +2950,39 @@ public:
 										result_ten->valuetype = get_int_with_basictype(td);
 										if (result_ten->valuetype == 8)
 										{
-											result_ten->valuetype_detail =
+											if(is_array_type){
+												result_ten->valuetype_detail =
+												get_addpointer_type(std);
+											}
+											else{
+												result_ten->valuetype_detail =
 												get_addpointer_type(td);
+											}
 										}
 										else
 										{
-											result_ten->valuetype_detail = td;
+											if(is_array_type){
+												result_ten->valuetype_detail =
+												get_addpointer_type(std);
+											}
+											else{
+												result_ten->valuetype_detail =
+												get_addpointer_type(td);
+											}
 											result_ten->mem.push_back(205);
 										}
 									}
 									else
 									{
 										result_ten->valuetype = 8;
-										result_ten->valuetype_detail =
+										if(is_array_type){
+											result_ten->valuetype_detail =
+											get_addpointer_type(std);
+										}
+										else{
+											result_ten->valuetype_detail =
 											get_addpointer_type(td);
+										}
 									}
 
 									result_ten->memsiz = result_ten->mem.size();
@@ -2964,20 +2997,39 @@ public:
 										result_ten->valuetype = get_int_with_basictype(td);
 										if (result_ten->valuetype == 8)
 										{
-											result_ten->valuetype_detail =
+											if(is_array_type){
+												result_ten->valuetype_detail =
+												get_addpointer_type(std);
+											}
+											else{
+												result_ten->valuetype_detail =
 												get_addpointer_type(td);
+											}
 										}
 										else
 										{
-											result_ten->valuetype_detail = td;
+											if(is_array_type){
+												result_ten->valuetype_detail =
+												get_addpointer_type(std);
+											}
+											else{
+												result_ten->valuetype_detail =
+												get_addpointer_type(td);
+											}
 											result_ten->mem.push_back(206);
 										}
 									}
 									else
 									{
 										result_ten->valuetype = 8;
-										result_ten->valuetype_detail =
+										if(is_array_type){
+											result_ten->valuetype_detail =
+											get_addpointer_type(std);
+										}
+										else{
+											result_ten->valuetype_detail =
 											get_addpointer_type(td);
+										}
 									}
 
 									result_ten->memsiz = result_ten->mem.size();
