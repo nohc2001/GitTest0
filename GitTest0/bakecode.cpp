@@ -594,9 +594,10 @@ public:
 	FM_System0 *fm;
 
 	// execute var
-	uint32_t max_mem_byte = 40960;
+	uint32_t max_mem_byte = 40960; // 40KB
 	byte8 *mem = nullptr;
 	vecarr<byte8> datamem;
+	int dataptr = max_mem_byte;
 
 	static constexpr uint32_t max_instruction = 256;
 	void *inst[max_instruction] = {};
@@ -2336,7 +2337,7 @@ public:
 				{
 					tm->mem.push_back(18);
 					byte8 add[4];
-					*reinterpret_cast<uint *>(&add[0]) = gvarid;
+					*reinterpret_cast<uint *>(&add[0]) = dataptr + gvarid;
 					for (int i = 0; i < 4; ++i)
 					{
 						tm->mem.push_back(add[i]);
@@ -2346,7 +2347,7 @@ public:
 				{
 					tm->mem.push_back(27);
 					byte8 add[4];
-					*reinterpret_cast<uint *>(&add[0]) = gvarid;
+					*reinterpret_cast<uint *>(&add[0]) = dataptr + gvarid;
 					for (int i = 0; i < 4; ++i)
 					{
 						tm->mem.push_back(add[i]);
@@ -4311,7 +4312,8 @@ public:
 			}
 			dbg_codesen(cs);
 		}
-		datamem.Init(gs + 1, false);
+		datamem.Init(gs + 8, false);
+		dataptr = datamem.Arr - mem;
 
 		mem[writeup++] = 189; // func
 		mem[writeup++] = 200; // jmp
