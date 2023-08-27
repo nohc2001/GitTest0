@@ -78,6 +78,14 @@ class lcstr
 			return false;
 	}
 
+	bool operator==(const char *str)
+	{
+		if (strcmp(Arr, str) == 0)
+			return true;
+		else
+			return false;
+	}
+
 	char &at(size_t i)
 	{
 		return Arr[i];

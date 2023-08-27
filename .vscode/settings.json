@@ -2,5 +2,6 @@
     "files.associations": {
         "sstream": "cpp"
     },
-    "chat.editor.fontFamily": "Consolas"
+    "editor.fontFamily": "Fira Code",
+    "editor.fontLigatures": true
 }

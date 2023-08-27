@@ -273,7 +273,7 @@ lcstr *GetCodeTXT(const char *filename, FM_System0 *fm)
 	}
 	else
 	{
-		printf("[ERROR] : file is nor exist.", filename);
+		printf("[ERROR] : %s file is nor exist.", filename);
 		return nullptr;
 	}
 }
@@ -4326,7 +4326,6 @@ vecarr<InsideCode_Bake *> icbarr;
 
 int code_control(vecarr<InsideCode_Bake *> *icbarr)
 {
-	/*
 	static int stack = 0;
 	for (int i = 0; i < icbarr->size(); ++i)
 	{
@@ -4348,7 +4347,7 @@ int code_control(vecarr<InsideCode_Bake *> *icbarr)
 	case 'e':
 		return 0;
 	}
-*/
+
 	return 1; // keep going
 }
 
