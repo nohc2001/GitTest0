@@ -766,12 +766,6 @@ public:
 		return nullptr;
 	}
 
-	bool isArrayType(type_data* td){
-		if(td == nullptr) return false;
-		if(td->typetype == 'a') return true;
-		else return false;
-	}
-
 	int get_int_with_basictype(type_data *td)
 	{
 		if (td == basictype[1])
@@ -2962,12 +2956,10 @@ public:
 										if (result_ten->valuetype == 8)
 										{
 											if(is_array_type){
-												result_ten->valuetype_detail =
-												get_addpointer_type(std);
+												result_ten->valuetype_detail = get_addpointer_type(std);
 											}
 											else{
-												result_ten->valuetype_detail =
-												get_addpointer_type(td);
+												result_ten->valuetype_detail = get_addpointer_type(td);
 											}
 										}
 										else
