@@ -278,7 +278,7 @@ lcstr *GetCodeTXT(const char *filename, FM_System0 *fm)
 	}
 }
 
-typedef enum class codeKind
+enum class codeKind
 {
 	ck_addVariable,
 	ck_setVariable,
@@ -295,7 +295,7 @@ typedef enum class codeKind
 	ck_addsetVariable
 };
 
-typedef struct code_sen
+struct code_sen
 {
 	char **sen;
 	int maxlen;
@@ -370,7 +370,7 @@ void dbg_codesen(code_sen *cs)
 	}
 }
 
-typedef struct type_data
+struct type_data
 {
 	lcstr name;
 
@@ -385,14 +385,14 @@ typedef struct type_data
 	// s - struct_data*
 };
 
-typedef struct NamingData
+struct NamingData
 {
 	char *name;
 	type_data *td;
 	int add_address;
 };
 
-typedef struct operator_data
+struct operator_data
 {
 	const char *symbol;
 	char mod = 'f'; // f : front / o - asmoper
@@ -410,7 +410,7 @@ operator_data create_oper(const char *symbo, char mo, int starto, int endo)
 	return op;
 }
 
-typedef enum class blockstate
+enum class blockstate
 {
 	bs_if,
 	bs_while,
@@ -418,7 +418,7 @@ typedef enum class blockstate
 	bs_struct
 };
 
-typedef struct block_data
+struct block_data
 {
 	byte8 *start_pc;
 	vecarr<NamingData> variable_data;
@@ -433,7 +433,7 @@ typedef struct block_data
 	int presentcsindex = 0;
 };
 
-typedef struct func_data
+struct func_data
 {
 	lcstr name;
 	byte8 *start_pc;
@@ -441,13 +441,13 @@ typedef struct func_data
 	type_data *returntype;
 };
 
-typedef struct struct_data
+struct struct_data
 {
 	lcstr name;
 	vecarr<NamingData> member_data;
 };
 
-typedef struct temp_mem
+struct temp_mem
 {
 	vecarr<byte8> mem;
 	int memsiz = 0;
@@ -455,7 +455,7 @@ typedef struct temp_mem
 	type_data *valuetype_detail;
 };
 
-typedef enum class casting_type
+enum class casting_type
 {
 	byte_to_short = 0,
 	byte_to_ushort = 1,
@@ -581,7 +581,7 @@ casting_type get_cast_type(int type0, int type1)
 	return casting_type::nocasting;
 }
 
-typedef struct instruct_data
+struct instruct_data
 {
 	char name[64] = {};
 	int param_num = 0;

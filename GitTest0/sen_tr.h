@@ -14,13 +14,13 @@
 
 using namespace freemem;
 
-typedef union segstr
+union segstr
 {
 	char *str;
 	char symbol;
 };
 
-typedef struct segment
+struct segment
 {
 	char type = 'w';			// w : word, x : variable
 	segstr data;				// word str
@@ -28,13 +28,13 @@ typedef struct segment
 
 typedef vecarr < segment > sen;
 
-typedef struct seg_variable
+struct seg_variable
 {
 	char symbol = 0;
 	sen *value;
 };
 
-typedef struct seg_range
+struct seg_range
 {
 	int start = 0;
 	int end = 0;
@@ -343,7 +343,7 @@ class word_base_sen_sys
 		return ret;
 	}
 	
-	int search_word_first(int index, sen* arr, char* word){
+	int search_word_first(int index, sen* arr, const char* word){
 		for(int i=index;i<arr->size();++i){
 			if(strcmp(arr->at(i).data.str, word) == 0){
 				return i;
@@ -373,7 +373,7 @@ class word_base_sen_sys
 		return rarr;
 	}
 
-	sen *oc_search(sen * arr, int start, char *open, char *close)
+	sen *oc_search(sen * arr, int start, const char *open, const char *close)
 	{
 		sen *rarr = (sen *) fm->_New(sizeof(sen), true);
 		rarr->NULLState();
@@ -407,7 +407,7 @@ class word_base_sen_sys
 		return rarr;
 	}
 
-	sen *oc_search_inv(sen * arr, int end, char *open, char *close)
+	sen *oc_search_inv(sen * arr, int end, const char *open, const char *close)
 	{
 		sen *rarr = (sen *) fm->_New(sizeof(sen), true);
 		rarr->NULLState();

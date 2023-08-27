@@ -906,7 +906,7 @@ namespace freemem
 
 		int GetSizeOfVariable(byte8 * variable)
 		{
-			if (bAlloc(variable, NULL))
+			if (bAlloc(variable, 0))
 			{
 				byte8 b = *(variable - SizeMemorySize);
 				int size = b;
