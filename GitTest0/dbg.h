@@ -17,4 +17,5 @@ bool contact(int amin, int amax, int bmin, int bmax){
 	if(inside(amin, bmin, amax) || inside(amin, bmax, amax)){
 		return true;
 	}
+	return false;
 }
