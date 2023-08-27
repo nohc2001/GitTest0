@@ -2886,8 +2886,19 @@ public:
 								temp_mem *left_ten = nullptr;
 								temp_mem *right_ten = nullptr;
 
-								bool is_array_type = segs[i]->at(0).type == 'a' && reinterpret_cast<temp_mem*>(segs[i]->at(0).data.str)->valuetype_detail->typetype == 'a';
-								is_array_type |= segs[i]->size() == 1 && get_type_with_vname(segs[i]->at(0).data.str)->typetype == 'a';
+								bool is_array_type = segs[i-1]->at(0).type == 'a' && reinterpret_cast<temp_mem*>(segs[i-1]->at(0).data.str)->valuetype_detail->typetype == 'a';
+								type_data* ltd = get_type_with_vname(segs[i-1]->at(0).data.str);
+								if(ltd == nullptr){
+									ltd = get_type_with_global_vname(segs[i-1]->at(0).data.str);
+								}
+
+								if(ltd == nullptr){
+									is_array_type = false;
+								}
+								else{
+									is_array_type |= segs[i-1]->size() == 1 && ltd->typetype == 'a';
+								}
+								
 								if(is_array_type){
 									//case 1 : array type
 									left_ten = get_asm_from_sen(segs.at(i - 1), true, false);
