@@ -2865,8 +2865,10 @@ public:
 									(temp_mem *)fm->_New(sizeof(temp_mem), true);
 								temp_mem *left_ten = nullptr;
 								temp_mem *right_ten = nullptr;
-								left_ten = get_asm_from_sen(segs.at(i - 1), true, false);
+								wbss.dbg_sen(segs.at(i - 1));
+								left_ten = get_asm_from_sen(segs.at(i - 1), true, true);
 								right_ten = get_asm_from_sen(segs.at(i + 1), true, true);
+								
 
 								result_ten->memsiz = left_ten->memsiz + right_ten->memsiz + 9;
 								result_ten->mem.NULLState();
@@ -2878,10 +2880,10 @@ public:
 								}
 
 								type_data *td = get_sub_type(left_ten->valuetype_detail);
-								type_data *std = get_sub_type(td);
+								//type_data *std = get_sub_type(td);
 								result_ten->mem.push_back(27); // b=const4
 								char cc[4] = {};
-								*reinterpret_cast<uint *>(cc) = std->typesiz;
+								*reinterpret_cast<uint *>(cc) = td->typesiz;
 								for (int u = 0; u < 4; ++u)
 									result_ten->mem.push_back(cc[u]);
 
@@ -2902,51 +2904,57 @@ public:
 								{
 									int opp = 63;
 									result_ten->mem.push_back((byte8)opp);
-									result_ten->memsiz = result_ten->mem.size();
+									
 									if (isvalue)
 									{
-										result_ten->valuetype = get_int_with_basictype(std);
+										result_ten->valuetype = get_int_with_basictype(td);
 										if (result_ten->valuetype == 8)
 										{
 											result_ten->valuetype_detail =
-												get_addpointer_type(std);
+												get_addpointer_type(td);
 										}
 										else
 										{
-											result_ten->valuetype_detail = std;
+											result_ten->valuetype_detail = td;
+											result_ten->mem.push_back(205);
 										}
 									}
 									else
 									{
 										result_ten->valuetype = 8;
 										result_ten->valuetype_detail =
-											get_addpointer_type(std);
+											get_addpointer_type(td);
 									}
+
+									result_ten->memsiz = result_ten->mem.size();
 								}
 								else
 								{
 									int opp = 64;
 									result_ten->mem.push_back((byte8)opp);
-									result_ten->memsiz = result_ten->mem.size();
+									
 									if (isvalue)
 									{
-										result_ten->valuetype = get_int_with_basictype(std);
+										result_ten->valuetype = get_int_with_basictype(td);
 										if (result_ten->valuetype == 8)
 										{
 											result_ten->valuetype_detail =
-												get_addpointer_type(std);
+												get_addpointer_type(td);
 										}
 										else
 										{
-											result_ten->valuetype_detail = std;
+											result_ten->valuetype_detail = td;
+											result_ten->mem.push_back(206);
 										}
 									}
 									else
 									{
 										result_ten->valuetype = 8;
 										result_ten->valuetype_detail =
-											get_addpointer_type(std);
+											get_addpointer_type(td);
 									}
+
+									result_ten->memsiz = result_ten->mem.size();
 								}
 
 								segs.erase(i + 1);
@@ -4271,6 +4279,7 @@ public:
 		lcstr &allcode = *allcodeptr;
 		AddTextBlocks(allcode);
 
+		/*
 		for (int i = 0; i < allcode_sen.size(); ++i)
 		{
 			cout << allcode_sen[i] << " ";
@@ -4280,6 +4289,7 @@ public:
 			}
 		}
 		cout << endl;
+		*/
 
 		vecarr<code_sen *> *senstptr = AddCodeFromBlockData(allcode_sen, "struct");
 
@@ -6071,7 +6081,7 @@ SET_A_CONST_STRING:
 	strmax = *reinterpret_cast<uint *>(*pci);
 	++*pci;
 	_as.move_pivot(-1);
-	_as[0] = reinterpret_cast<uint64_t>(*pc);
+	_as[0] = *pc - mem;
 	*pc += strmax;
 	goto INSTEND;
 
@@ -6080,7 +6090,7 @@ SET_B_CONST_STRING:
 	strmax = *reinterpret_cast<uint *>(*pci);
 	++*pci;
 	_bs.move_pivot(-1);
-	_bs[0] = reinterpret_cast<uint64_t>(*pc);
+	_bs[0] = *pc - mem;
 	*pc += strmax;
 	goto INSTEND;
 
@@ -6430,5 +6440,5 @@ int main()
 	exeicbs.NULLState();
 	exeicbs.Init(2, false);
 	exeicbs.push_back(&icb);
-	execute(exeicbs, 1, code_control, true);
+	execute(exeicbs, 10000, code_control, true);
 }
