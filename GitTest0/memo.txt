@@ -1,17 +1,1 @@
-배열 인덱스 연산[]
-두가지 케이스
-1. array type
-	T arr[max] = {};
-	value - arr[i] type = T
-	ptr - &arr[i] type = T*
-2. ptr type
-	value - ptr[i] = *(ptr + i)
-	ptr - ptr[i] = ptr + i
-
-ex> 2차원 배열
-T[i][k] arr = {{}};
-arr[x][y]
-left get v : arr - type : T[i][k]
-left get ptr : arr - type : T[i][k]*
-right : [x]
-sub(left)
+1895 - 1932

@@ -415,7 +415,8 @@ enum class blockstate
 	bs_if,
 	bs_while,
 	bs_function,
-	bs_struct
+	bs_struct,
+	bs_else
 };
 
 struct block_data
@@ -3584,8 +3585,14 @@ public:
 	{
 		sen *code = get_sen_from_codesen(cs);
 		int loc = wbss.search_word_first(0, code, "if");
-		if (loc == -1)
+		if (loc == -1){
+			//else
+			nextbd.bs = blockstate::bs_else;
+			code->release();
+			fm->_Delete((byte8 *)code, sizeof(sen));
 			return;
+		}
+			
 		sen *inner_expr = wbss.oc_search(code, loc, "(", ")");
 		// wbss.dbg_sen(inner_expr);
 		inner_expr->pop_back();
@@ -3806,7 +3813,10 @@ public:
 							{
 								// else
 								compile_code(css2);
-								cout << "dbg" << endl;
+								css2 = reinterpret_cast<code_sen *>(cs->codeblocks->at(ifk + 1));
+								compile_code(css2);
+								ifk += 2;
+								continue;
 							}
 							else
 							{
