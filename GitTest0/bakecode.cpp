@@ -2958,7 +2958,13 @@ public:
 									
 									if (isvalue)
 									{
-										result_ten->valuetype = get_int_with_basictype(td);
+										if(is_array_type){
+											result_ten->valuetype = get_int_with_basictype(std);
+										}
+										else{
+											result_ten->valuetype = get_int_with_basictype(td);
+										}
+										
 										if (result_ten->valuetype == 8)
 										{
 											if(is_array_type){
@@ -2971,12 +2977,10 @@ public:
 										else
 										{
 											if(is_array_type){
-												result_ten->valuetype_detail =
-												get_addpointer_type(std);
+												result_ten->valuetype_detail = std;
 											}
 											else{
-												result_ten->valuetype_detail =
-												get_addpointer_type(td);
+												result_ten->valuetype_detail = td;
 											}
 											result_ten->mem.push_back(205);
 										}
