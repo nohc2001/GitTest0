@@ -1,22 +1,17 @@
-2차원 배열이 되지 않는 문제
-asm을 정할때
-이 세그먼트가 값이냐 포인터냐를 정하는건 연산이다.
+배열 인덱스 연산[]
+두가지 케이스
+1. array type
+	T arr[max] = {};
+	value - arr[i] type = T
+	ptr - &arr[i] type = T*
+2. ptr type
+	value - ptr[i] = *(ptr + i)
+	ptr - ptr[i] = ptr + i
 
-if (isvalue)
-										{
-											result_ten->mem.push_back(206);
-											type_data *subt = get_sub_type(td);
-											result_ten->valuetype = get_int_with_basictype(subt);	// ptr
-											result_ten->valuetype_detail = subt;
-										}
-										else
-										{
-											
-문제는 포인터 연산을 한 값이 포인터가 나왔을때와 포인터연산을 한 주소값이 나왔을 때를 구분할 수 없다는 것에 있다?
-ex
-int[20][10] a; (a[2]+2)[3]
-int
-
-int형변수를 가리키는걸 int, 8로하는지, int* 8로하는지 기준을 명확히 하자.
-
-int* 8로 통일됨.
+ex> 2차원 배열
+T[i][k] arr = {{}};
+arr[x][y]
+left get v : arr - type : T[i][k]
+left get ptr : arr - type : T[i][k]*
+right : [x]
+sub(left)
