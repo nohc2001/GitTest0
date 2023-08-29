@@ -113,6 +113,9 @@ int main()
 		print_board();
 		input();
 		result = check_win();
+
+		oturn = !oturn;
+		
 		if(result != 0){
 			break;
 		}

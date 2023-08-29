@@ -4687,7 +4687,7 @@ SET_STACK_VARIABLE_ADDRESS_1:
 	++*pc;
 	tmptr_b = (*rfsp - (**pci));
 	++*pci;
-	*tmptr_b = mem[**pci];
+	*tmptr_b = *reinterpret_cast<byte8*>(mem + (int)**pci);
 	++*pci;
 	goto INSTEND;
 
@@ -4696,7 +4696,7 @@ SET_STACK_VARIABLE_ADDRESS_2:
 	++*pc;
 	tmptr_s = reinterpret_cast<ushort *>(*rfsp - (**pci));
 	++*pci;
-	*tmptr_s = *reinterpret_cast<ushort *>(&mem[**pci]);
+	*tmptr_s = *reinterpret_cast<ushort *>(mem + (int)**pci);
 	++*pci;
 	goto INSTEND;
 
@@ -4705,7 +4705,7 @@ SET_STACK_VARIABLE_ADDRESS_4:
 	++*pc;
 	tmptr_i = reinterpret_cast<uint *>(*rfsp - (**pci));
 	++*pci;
-	*tmptr_i = *reinterpret_cast<uint *>(&mem[**pci]);
+	*tmptr_i = *reinterpret_cast<uint *>(mem + (int)**pci);
 	++*pci;
 	goto INSTEND;
 
@@ -4763,7 +4763,7 @@ SET_A_CONST_4:
 SET_A_ADDRESS_1:
 	++*pc;
 	_as.move_pivot(-1);
-	_as[0] = mem[**pci];
+	_as[0] = *reinterpret_cast<byte8*>(mem + (int)**pci);
 	++*pci;
 	goto INSTEND;
 
@@ -4771,7 +4771,7 @@ SET_A_ADDRESS_1:
 SET_A_ADDRESS_2:
 	++*pc;
 	_as.move_pivot(-1);
-	_as[0] = *reinterpret_cast<ushort *>(&mem[**pci]);
+	_as[0] = *reinterpret_cast<ushort *>(mem + (int)**pci);
 	++pci;
 	goto INSTEND;
 
@@ -4779,7 +4779,7 @@ SET_A_ADDRESS_2:
 SET_A_ADDRESS_4:
 	++*pc;
 	_as.move_pivot(-1);
-	_as[0] = *reinterpret_cast<uint *>(&mem[**pci]);
+	_as[0] = *reinterpret_cast<uint *>(mem + (int)**pci);
 	++*pci;
 	goto INSTEND;
 
@@ -4834,7 +4834,7 @@ SET_B_CONST_4:
 SET_B_ADDRESS_1:
 	++*pc;
 	_bs.move_pivot(-1);
-	_bs[0] = mem[**pci];
+	_bs[0] = *reinterpret_cast<byte8*>(mem + (int)**pci);
 	++*pci;
 	goto INSTEND;
 
@@ -4842,7 +4842,7 @@ SET_B_ADDRESS_1:
 SET_B_ADDRESS_2:
 	++*pc;
 	_bs.move_pivot(-1);
-	_bs[0] = *reinterpret_cast<ushort *>(&mem[**pci]);
+	_bs[0] = *reinterpret_cast<ushort *>(mem + (int)**pci);
 	++*pci;
 	goto INSTEND;
 
@@ -4850,7 +4850,7 @@ SET_B_ADDRESS_2:
 SET_B_ADDRESS_4:
 	++*pc;
 	_bs.move_pivot(-1);
-	_bs[0] = *reinterpret_cast<uint *>(&mem[**pci]);
+	_bs[0] = *reinterpret_cast<uint *>(mem + (int)**pci);
 	++*pci;
 	goto INSTEND;
 
@@ -4901,21 +4901,21 @@ SET_X_CONST_4:
 	// address
 SET_X_ADDRESS_1:
 	++*pc;
-	_x = mem[**pci];
+	_x = *reinterpret_cast<byte8*>(mem + (int)**pci);
 	++*pci;
 	goto INSTEND;
 
 	// address
 SET_X_ADDRESS_2:
 	++*pc;
-	_x = *reinterpret_cast<ushort *>(&mem[**pci]);
+	_x = *reinterpret_cast<ushort *>(mem + (int)**pci);
 	++*pci;
 	goto INSTEND;
 
 	// address
 SET_X_ADDRESS_4:
 	++*pc;
-	_x = *reinterpret_cast<uint *>(&mem[**pci]);
+	_x = *reinterpret_cast<uint *>(mem + (int)**pci);
 	++*pci;
 	goto INSTEND;
 
@@ -4963,21 +4963,21 @@ SET_Y_CONST_4:
 	// address
 SET_Y_ADDRESS_1:
 	++*pc;
-	_y = mem[**pci];
+	_y = *reinterpret_cast<byte8*>(mem + (int)**pci);
 	++*pci;
 	goto INSTEND;
 
 	// address
 SET_Y_ADDRESS_2:
 	++*pc;
-	_y = *reinterpret_cast<ushort *>(&mem[**pci]);
+	_y = *reinterpret_cast<ushort *>(mem + (int)**pci);
 	++*pci;
 	goto INSTEND;
 
 	// address
 SET_Y_ADDRESS_4:
 	++*pc;
-	_y = *reinterpret_cast<uint *>(&mem[**pci]);
+	_y = *reinterpret_cast<uint *>(mem + (int)**pci);
 	++*pci;
 	goto INSTEND;
 
@@ -6039,22 +6039,22 @@ CAST_FLOAT_TO_UINT:
 	goto *castend_label;
 
 GET_VALUE_A:
-	_as[0] = *reinterpret_cast<uint *>(&mem[_as[0]]);
+	_as[0] = *reinterpret_cast<uint *>(mem + _as[0]);
 	++*pc;
 	goto INSTEND;
 
 GET_VALUE_B:
-	_bs[0] = *reinterpret_cast<uint *>(&mem[_bs[0]]);
+	_bs[0] = *reinterpret_cast<uint *>(mem + _bs[0]);
 	++*pc;
 	goto INSTEND;
 
 GET_VALUE_X:
-	_x = *reinterpret_cast<uint *>(&mem[_x]);
+	_x = *reinterpret_cast<uint *>(mem + _x);
 	++*pc;
 	goto INSTEND;
 
 GET_VALUE_Y:
-	_y = *reinterpret_cast<uint *>(&mem[_y]);
+	_y = *reinterpret_cast<uint *>(mem + _y);
 	++*pc;
 	goto INSTEND;
 
@@ -6097,7 +6097,7 @@ DBG_A_FLOAT:
 	goto DBG_END;
 
 DBG_A_STRING:
-	printf("%s", reinterpret_cast<char *>(&mem[_as[0]]));
+	printf("%s", reinterpret_cast<char *>(mem + _as[0]));
 	goto DBG_END;
 
 INP_A_PTR:
@@ -6107,14 +6107,14 @@ INP_A_END:
 	goto INSTEND;
 
 INP_BYTE:
-	scanf("%c", reinterpret_cast<char *>(&mem[_as[0]]));
+	scanf("%c", reinterpret_cast<char *>(mem + (int)_as[0]));
 	goto INP_A_END;
 
 INP_UBYTE:
 {
 	unsigned int in;
 	scanf("%u", &in);
-	*reinterpret_cast<byte8 *>(&mem[_as[0]]) = (byte8)in;
+	*reinterpret_cast<byte8 *>(mem + (int)_as[0]) = (byte8)in;
 }
 	goto INP_A_END;
 
@@ -6122,7 +6122,7 @@ INP_SHORT:
 {
 	int in;
 	scanf("%d", &in);
-	*reinterpret_cast<short *>(&mem[_as[0]]) = (short)in;
+	*reinterpret_cast<short *>(mem + (int)_as[0]) = (short)in;
 }
 	goto INP_A_END;
 
@@ -6130,20 +6130,20 @@ INP_USHORT:
 {
 	unsigned int in;
 	scanf("%u", &in);
-	*reinterpret_cast<ushort *>(&mem[_as[0]]) = (ushort)in;
+	*reinterpret_cast<ushort *>(mem + (int)_as[0]) = (ushort)in;
 }
 	goto INP_A_END;
 
 INP_INT:
-	scanf("%d", reinterpret_cast<int *>(&mem[_as[0]]));
+	scanf("%d", reinterpret_cast<int *>(mem + (int)_as[0]));
 	goto INP_A_END;
 
 INP_UINT:
-	scanf("%u", reinterpret_cast<uint *>(&mem[_as[0]]));
+	scanf("%u", reinterpret_cast<uint *>(mem + (int)_as[0]));
 	goto INP_A_END;
 
 INP_FLOAT:
-	scanf("%f", reinterpret_cast<float *>(&mem[_as[0]]));
+	scanf("%f", reinterpret_cast<float *>(mem + (int)_as[0]));
 	goto INP_A_END;
 
 INP_BOOL:
@@ -6152,31 +6152,31 @@ INP_BOOL:
 	scanf("%s", str);
 	if (strcmp(str, "true"))
 	{
-		*reinterpret_cast<bool *>(&mem[_as[0]]) = true;
+		*reinterpret_cast<bool *>(mem + (int)_as[0]) = true;
 	}
 	else
 	{
-		*reinterpret_cast<bool *>(&mem[_as[0]]) = false;
+		*reinterpret_cast<bool *>(mem + (int)_as[0]) = false;
 	}
 }
 	goto INP_A_END;
 
 INP_STRING:
-	scanf("%s", reinterpret_cast<char *>(&mem[_as[0]]));
+	scanf("%s", reinterpret_cast<char *>(mem + (int)_as[0]));
 	goto INP_A_END;
 
 SET_ADDRESS_LA_FROM_A_1:
-	mem[_la] = _as[0];
+	*reinterpret_cast<byte8*>(mem + (int)_la) = _as[0];
 	++*pc;
 	goto INSTEND;
 
 SET_ADDRESS_LA_FROM_A_2:
-	*reinterpret_cast<ushort *>(&mem[_la]) = _as[0];
+	*reinterpret_cast<ushort *>(mem + (int)_la) = _as[0];
 	++*pc;
 	goto INSTEND;
 
 SET_ADDRESS_LA_FROM_A_4:
-	*reinterpret_cast<uint *>(&mem[_la]) = _as[0];
+	*reinterpret_cast<uint *>(mem + (int)_la) = _as[0];
 	++*pc;
 	goto INSTEND;
 
