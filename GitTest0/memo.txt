@@ -1,0 +1,8 @@
+디버깅 시스템 만들자.
+bool breaking = false;
+// asm 1000 줄에 중단점을 걸기
+if(pc == 1000){
+    breaking = true;
+}
+
+-> 오류의 원인 : 배열인덱스 연산을 할때 UINT_ADD 대신 INT_ADD를 써야 함.

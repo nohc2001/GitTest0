@@ -2953,7 +2953,7 @@ public:
 
 								if (is_a)
 								{
-									int opp = 63;
+									int opp = 61;
 									result_ten->mem.push_back((byte8)opp);
 									
 									if (isvalue)
@@ -3002,7 +3002,7 @@ public:
 								}
 								else
 								{
-									int opp = 64;
+									int opp = 62;
 									result_ten->mem.push_back((byte8)opp);
 									
 									if (isvalue)
@@ -3118,12 +3118,12 @@ public:
 										if (is_a)
 										{
 											// a=x+y uint
-											result_ten->mem.push_back(63);
+											result_ten->mem.push_back(61);
 										}
 										else
 										{
 											// b=x+y uint
-											result_ten->mem.push_back(64);
+											result_ten->mem.push_back(62);
 										}
 
 										// ptr
@@ -3201,12 +3201,12 @@ public:
 										if (is_a)
 										{
 											// a=x+y uint
-											result_ten->mem.push_back(63);
+											result_ten->mem.push_back(61);
 										}
 										else
 										{
 											// b=x+y uint
-											result_ten->mem.push_back(64);
+											result_ten->mem.push_back(62);
 										}
 
 										// ptr
@@ -3880,6 +3880,11 @@ public:
 				writeup += 4;
 			}
 			break;
+			case blockstate::bs_function:
+			{
+				mem[writeup++] = 193; // return
+			}
+			break;
 			}
 
 			if (bd->breakpoints != nullptr)
@@ -4436,11 +4441,17 @@ public:
 
 vecarr<InsideCode_Bake *> icbarr;
 
+bool isBreaking = false;
+int stopnum = -1;
+
 int code_control(vecarr<InsideCode_Bake *> *icbarr)
 {
 	static int stack = 0;
-	
-	/*
+
+	if(isBreaking == false){
+		return 1;
+	}
+
 	for (int i = 0; i < icbarr->size(); ++i)
 	{
 		//cout << "thread[ " << i << " ] next instruction" << endl;
@@ -4449,13 +4460,12 @@ int code_control(vecarr<InsideCode_Bake *> *icbarr)
 		icbarr->at(i)->dbg_data();
 		icbarr->at(i)->dbg_registers();
 	}
-	*/
 
 	char c = 1;
 	stack++;
 	if (stack >= 1)
 	{
-		//scanf("%c", &c);
+		scanf("%c", &c);
 		stack = 0;
 	}
 	switch (c)
@@ -4582,6 +4592,10 @@ CONTEXT_SWITCH:
 	lfsps = reinterpret_cast<ushort **>(lfsp);
 	lfspi = reinterpret_cast<uint **>(lfsp);
 
+	if((int)(icb->pc - mem) == stopnum){
+		isBreaking = true;
+		cout << "Debug BreakPoint Check!" << endl;
+	}
 	goto *inst[**pc];
 
 INSTEND:
@@ -4599,6 +4613,12 @@ INSTEND:
 		++n;
 		goto CONTEXT_SWITCH;
 	}
+
+	if((int)(icb->pc - mem) == stopnum){
+		isBreaking = true;
+		cout << "Debug BreakPoint Check!" << endl;
+	}
+
 	goto *inst[**pc];
 
 PROGRAMQUIT:
@@ -6544,5 +6564,5 @@ int main()
 	exeicbs.NULLState();
 	exeicbs.Init(2, false);
 	exeicbs.push_back(&icb);
-	execute(exeicbs, 100, code_control, true);
+	execute(exeicbs, 1, code_control, true);
 }
