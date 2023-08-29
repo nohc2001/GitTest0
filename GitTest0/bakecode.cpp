@@ -6039,22 +6039,22 @@ CAST_FLOAT_TO_UINT:
 	goto *castend_label;
 
 GET_VALUE_A:
-	_as[0] = *reinterpret_cast<uint *>(mem + _as[0]);
+	_as[0] = *reinterpret_cast<uint *>(mem + (int)_as[0]);
 	++*pc;
 	goto INSTEND;
 
 GET_VALUE_B:
-	_bs[0] = *reinterpret_cast<uint *>(mem + _bs[0]);
+	_bs[0] = *reinterpret_cast<uint *>(mem + (int)_bs[0]);
 	++*pc;
 	goto INSTEND;
 
 GET_VALUE_X:
-	_x = *reinterpret_cast<uint *>(mem + _x);
+	_x = *reinterpret_cast<uint *>(mem + (int)_x);
 	++*pc;
 	goto INSTEND;
 
 GET_VALUE_Y:
-	_y = *reinterpret_cast<uint *>(mem + _y);
+	_y = *reinterpret_cast<uint *>(mem + (int)_y);
 	++*pc;
 	goto INSTEND;
 
@@ -6097,7 +6097,7 @@ DBG_A_FLOAT:
 	goto DBG_END;
 
 DBG_A_STRING:
-	printf("%s", reinterpret_cast<char *>(mem + _as[0]));
+	printf("%s", reinterpret_cast<char *>(mem + (int)_as[0]));
 	goto DBG_END;
 
 INP_A_PTR:
