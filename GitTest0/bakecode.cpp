@@ -4046,7 +4046,9 @@ public:
 				mem[writeup++] = tm->mem[k];
 			}
 			mem[writeup++] = 210;
-			mem[writeup++] = (byte8)tm->valuetype;
+
+			type_data* std = get_sub_type(tm->valuetype_detail);
+			mem[writeup++] = (byte8)get_int_with_basictype(std);
 
 			code->release();
 			fm->_Delete((byte8 *)code, sizeof(sen));
@@ -4442,7 +4444,7 @@ public:
 vecarr<InsideCode_Bake *> icbarr;
 
 bool isBreaking = false;
-int stopnum = -1;
+int stopnum = 1927;
 
 int code_control(vecarr<InsideCode_Bake *> *icbarr)
 {
@@ -5884,7 +5886,11 @@ RETURN:
 	fsp->pop_back();
 	*lfsp = (*fsp)[fsp->size() - 2];
 	*pc = call_stack->last();
+	call_stack->pop_back();
 	++*pc;
+	if(call_stack->size() == 0){
+		goto EXIT;
+	}
 	goto INSTEND;
 
 EXIT:
@@ -6564,5 +6570,5 @@ int main()
 	exeicbs.NULLState();
 	exeicbs.Init(2, false);
 	exeicbs.push_back(&icb);
-	execute(exeicbs, 1, code_control, true);
+	execute(exeicbs, 1000, code_control, true);
 }
