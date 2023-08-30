@@ -591,6 +591,9 @@ struct instruct_data
 
 class InsideCode_Bake
 {
+private:
+	bool current_if_is_multiple = false;
+
 public:
 	FM_System0 *fm;
 
@@ -3773,6 +3776,7 @@ public:
 					int stack = 0;
 					if (cs->codeblocks->size() <= i + 2)
 					{
+						current_if_is_multiple = false;
 						compile_code(css);
 						continue;
 					}
@@ -3792,13 +3796,16 @@ public:
 						ifi -= 1;
 					}
 
+					//compile if
 					if (stack == 0)
 					{
+						current_if_is_multiple = false;
 						compile_code(css);
 						continue;
 					}
 					else
 					{
+						current_if_is_multiple = true;
 						// else if if
 						compile_code(css);
 						css2 = reinterpret_cast<code_sen *>(cs->codeblocks->at(i + 1));
@@ -3857,8 +3864,14 @@ public:
 			case blockstate::bs_if:
 				// case 1 : if only - writeup;
 				// case 2 : if / else or more - writeup+5;
-				*reinterpret_cast<uint *>(&mem[blockstack.last()->parameter[0]]) =
+				if(current_if_is_multiple){
+					*reinterpret_cast<uint *>(&mem[blockstack.last()->parameter[0]]) =
 					(uint)writeup + 5;
+				}
+				else{
+					*reinterpret_cast<uint *>(&mem[blockstack.last()->parameter[0]]) =
+					(uint)writeup;
+				}
 				break;
 			case blockstate::bs_while:
 			{
