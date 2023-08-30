@@ -3588,6 +3588,7 @@ public:
 	void compile_if(code_sen *cs)
 	{
 		sen *code = get_sen_from_codesen(cs);
+		wbss.dbg_sen(code);
 		int loc = wbss.search_word_first(0, code, "if");
 		if (loc == -1){
 			//else
@@ -3854,6 +3855,8 @@ public:
 			switch (blockstack.last()->bs)
 			{
 			case blockstate::bs_if:
+				// case 1 : if only - writeup;
+				// case 2 : if / else or more - writeup+5;
 				*reinterpret_cast<uint *>(&mem[blockstack.last()->parameter[0]]) =
 					(uint)writeup + 5;
 				break;
