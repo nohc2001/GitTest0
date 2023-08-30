@@ -3880,7 +3880,7 @@ public:
 				for (int i = 0; i < blockstack.last()->breakpoints->size(); ++i)
 				{
 					*reinterpret_cast<uint *>(&mem[blockstack.last()->breakpoints->at(i)]) =
-						(uint)writeup;
+						(uint)writeup + 5;
 				}
 
 				for (int i = 0; i < blockstack.last()->continuepoints->size(); ++i)
