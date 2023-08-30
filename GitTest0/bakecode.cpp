@@ -4444,7 +4444,7 @@ public:
 vecarr<InsideCode_Bake *> icbarr;
 
 bool isBreaking = false;
-int stopnum = 1927;
+int stopnum = -1;
 
 int code_control(vecarr<InsideCode_Bake *> *icbarr)
 {
