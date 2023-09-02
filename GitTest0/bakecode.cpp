@@ -2707,6 +2707,11 @@ public:
 								temp_mem *right_ten = nullptr;
 								left_ten = get_asm_from_sen(segs.at(i - 1), true, true);
 								right_ten = get_asm_from_sen(segs.at(i + 1), false, true);
+								/*
+								wbss.dbg_sen(segs.at(i-1));
+								cout << basicoper[k].symbol << endl;
+								wbss.dbg_sen(segs.at(i+1));
+								*/
 								int opertype = combine_opertype(left_ten->valuetype,
 																right_ten->valuetype);
 								int add = 1;
@@ -2776,9 +2781,89 @@ public:
 							}
 							else if (basicoper[k].endop - basicoper[k].startop == 1)
 							{
-								// input bool oper
-								if (k == 16)
+								if(basicoper[k].startop == 127 || basicoper[k].startop == 129){
+									// input num oper
+									temp_mem *result_ten =
+										(temp_mem *)fm->_New(sizeof(temp_mem), true);
+									temp_mem *left_ten = nullptr;
+									temp_mem *right_ten = nullptr;
+									left_ten = get_asm_from_sen(segs.at(i - 1), true, true);
+									right_ten = get_asm_from_sen(segs.at(i + 1), false, true);
+									/*
+									wbss.dbg_sen(segs.at(i-1));
+									cout << basicoper[k].symbol << endl;
+									wbss.dbg_sen(segs.at(i+1));
+									*/
+									int opertype = combine_opertype(left_ten->valuetype,
+																	right_ten->valuetype);
+									int add = 1;
+									int leftcast = (int)get_cast_type(left_ten->valuetype, opertype);
+									int rightcast = (int)get_cast_type(right_ten->valuetype, opertype);
+
+									if (leftcast != (int)casting_type::nocasting)
+										++add;
+
+									if (rightcast != (int)casting_type::nocasting)
+										++add;
+
+									result_ten->mem.NULLState();
+									result_ten->mem.Init(result_ten->memsiz + 1, false);
+									for (int u = 0; u < left_ten->memsiz; ++u)
+									{
+										result_ten->mem.push_back(left_ten->mem[u]);
+									}
+									// a casting
+									if (leftcast != (int)casting_type::nocasting)
+									{
+										result_ten->mem.push_back((byte8)201);
+										result_ten->mem.push_back((byte8)leftcast);
+									}
+									for (int u = 0; u < right_ten->memsiz; ++u)
+									{
+										result_ten->mem.push_back(right_ten->mem[u]);
+									}
+									// b casting
+									if (rightcast != (int)casting_type::nocasting)
+									{
+										result_ten->mem.push_back((byte8)202);
+										result_ten->mem.push_back((byte8)rightcast);
+									}
+
+									result_ten->mem.push_back(52);
+									result_ten->mem.push_back(218); // POP
+
+									if (is_a)
+									{
+										int opp = basicoper[k].startop;
+										result_ten->mem.push_back((byte8)opp);
+									}
+									else
+									{
+										int opp = basicoper[k].startop;
+										result_ten->mem.push_back((byte8)opp);
+									}
+									result_ten->memsiz = result_ten->mem.size();
+
+									if (k <= 10)
+									{
+										result_ten->valuetype = opertype;
+									}
+									else
+									{
+										result_ten->valuetype = 7; // bool
+									}
+									result_ten->valuetype_detail =
+										get_basic_type_with_int(result_ten->valuetype);
+
+									segs.erase(i + 1);
+									segs[i]->at(0).type = 'a'; // asm
+									segs[i]->at(0).data.str = reinterpret_cast<char *>(result_ten);
+									segs.erase(i - 1);
+									--i;
+								}
+								else if (k == 16)
 								{
+									
 									// ! not
 									temp_mem *result_ten =
 										(temp_mem *)fm->_New(sizeof(temp_mem), true);
@@ -4460,7 +4545,7 @@ public:
 vecarr<InsideCode_Bake *> icbarr;
 
 bool isBreaking = false;
-int stopnum = 1742;
+int stopnum = -1;
 
 int code_control(vecarr<InsideCode_Bake *> *icbarr)
 {
@@ -4507,6 +4592,7 @@ void execute(vecarr<InsideCode_Bake *> icbarr, int execodenum,
 	register uint64_t _y = 0;
 	register uint64_t _la = 0;
 	uint64_t casting_value = 0;
+	uint64_t casted_value = 0;
 	void *castend_label = nullptr;
 
 	int n = 0;
@@ -5959,125 +6045,129 @@ FUNCJMP:
 
 CASTEND_A:
 	//_as.move_pivot(-1);
-	_as[0] = casting_value;
+	_as[0] = casted_value;
 	++*pc;
 	goto INSTEND;
 
 CASTEND_B:
 	//_bs.move_pivot(-1);
-	_bs[0] = casting_value;
+	_bs[0] = casted_value;
 	++*pc;
 	goto INSTEND;
 
 CASTEND_X:
-	_x = casting_value;
+	_x = casted_value;
 	++*pc;
 	goto INSTEND;
 
 CASTEND_Y:
-	_y = casting_value;
+	_y = casted_value;
 	++*pc;
 	goto INSTEND;
 
 CASTING_A:
 	castend_label = &&CASTEND_A;
 	casting_value = _as[0];
+	casted_value = 0;
 	goto *cast[*++*pc];
 
 CASTING_B:
 	castend_label = &&CASTEND_B;
 	casting_value = _bs[0];
+	casted_value = 0;
 	goto *cast[*++*pc];
 
 CASTING_X:
 	castend_label = &&CASTEND_X;
 	casting_value = _x;
+	casted_value = 0;
 	goto *cast[*++*pc];
 
 CASTING_Y:
 	castend_label = &&CASTEND_Y;
 	casting_value = _y;
+	casted_value = 0;
 	goto *cast[*++*pc];
 
 	// CASTING TYPES
 CAST_BYTE_TO_SHORT:
-	casting_value = (short)*reinterpret_cast<char *>(&casting_value);
+	casted_value = (short)*reinterpret_cast<char *>(&casting_value);
 	goto *castend_label;
 
 CAST_BYTE_TO_USHORT:
-	casting_value = (ushort) * reinterpret_cast<char *>(&casting_value);
+	casted_value = (ushort) * reinterpret_cast<char *>(&casting_value);
 	goto *castend_label;
 
 CAST_BYTE_TO_INT:
-	casting_value = (int)*reinterpret_cast<char *>(&casting_value);
+	casted_value = (int)*reinterpret_cast<char *>(&casting_value);
 	goto *castend_label;
 
 CAST_BYTE_TO_UINT:
-	casting_value = (uint) * reinterpret_cast<char *>(&casting_value);
+	casted_value = (uint) * reinterpret_cast<char *>(&casting_value);
 	goto *castend_label;
 
 CAST_BYTE_TO_FLOAT:
-	casting_value = (float)*reinterpret_cast<char *>(&casting_value);
+	casted_value = (float)*reinterpret_cast<char *>(&casting_value);
 	goto *castend_label;
 
 CAST_UBYTE_TO_FLOAT:
-	casting_value = (float)*reinterpret_cast<byte8 *>(&casting_value);
+	casted_value = (float)*reinterpret_cast<byte8 *>(&casting_value);
 	goto *castend_label;
 
 CAST_SHORT_TO_BYTE:
-	casting_value = (char)*reinterpret_cast<short *>(&casting_value);
+	casted_value = (char)*reinterpret_cast<short *>(&casting_value);
 	goto *castend_label;
 
 CAST_SHORT_TO_INT:
-	casting_value = (int)*reinterpret_cast<short *>(&casting_value);
+	casted_value = (int)*reinterpret_cast<short *>(&casting_value);
 	goto *castend_label;
 
 CAST_SHORT_TO_FLOAT:
-	casting_value = (float)*reinterpret_cast<short *>(&casting_value);
+	casted_value = (float)*reinterpret_cast<short *>(&casting_value);
 	goto *castend_label;
 
 CAST_USHORT_TO_FLOAT:
-	casting_value = (float)*reinterpret_cast<ushort *>(&casting_value);
+	casted_value = (float)*reinterpret_cast<ushort *>(&casting_value);
 	goto *castend_label;
 
 CAST_INT_TO_BYTE:
-	casting_value = (char)*reinterpret_cast<int *>(&casting_value);
+	casted_value = (char)*reinterpret_cast<int *>(&casting_value);
 	goto *castend_label;
 
 CAST_INT_TO_SHORT:
-	casting_value = (short)*reinterpret_cast<int *>(&casting_value);
+	casted_value = (short)*reinterpret_cast<int *>(&casting_value);
 	goto *castend_label;
 
 CAST_INT_TO_FLOAT:
-	casting_value = (float)*reinterpret_cast<int *>(&casting_value);
+	casted_value = (float)*reinterpret_cast<int *>(&casting_value);
 	goto *castend_label;
 
 CAST_UINT_TO_FLOAT:
-	casting_value = (float)*reinterpret_cast<uint *>(&casting_value);
+	casted_value = (float)*reinterpret_cast<uint *>(&casting_value);
 	goto *castend_label;
 
 CAST_FLOAT_TO_BYTE:
-	casting_value = (char)*reinterpret_cast<float *>(&casting_value);
+	casted_value = (char)*reinterpret_cast<float *>(&casting_value);
 	goto *castend_label;
 
 CAST_FLOAT_TO_UBYTE:
-	casting_value = (byte8) * reinterpret_cast<float *>(&casting_value);
+	casted_value = (byte8) * reinterpret_cast<float *>(&casting_value);
 	goto *castend_label;
 
 CAST_FLOAT_TO_SHORT:
-	casting_value = (short)*reinterpret_cast<float *>(&casting_value);
+	casted_value = (short)*reinterpret_cast<float *>(&casting_value);
 	goto *castend_label;
 
 CAST_FLOAT_TO_USHORT:
-	casting_value = (ushort) * reinterpret_cast<float *>(&casting_value);
+	casted_value = (ushort) * reinterpret_cast<float *>(&casting_value);
 	goto *castend_label;
 
 CAST_FLOAT_TO_INT:
-	casting_value = (int)*reinterpret_cast<float *>(&casting_value);
+	casted_value = (int)*reinterpret_cast<float *>(&casting_value);
 	goto *castend_label;
 
 CAST_FLOAT_TO_UINT:
-	casting_value = (uint) * reinterpret_cast<float *>(&casting_value);
+	casted_value = (uint) * reinterpret_cast<float *>(&casting_value);
 	goto *castend_label;
 
 GET_VALUE_A:
