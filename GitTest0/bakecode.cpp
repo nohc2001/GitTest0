@@ -2783,7 +2783,7 @@ public:
 									temp_mem *result_ten =
 										(temp_mem *)fm->_New(sizeof(temp_mem), true);
 									temp_mem *right_ten = nullptr;
-									right_ten = get_asm_from_sen(segs.at(i + 1), false, true);
+									right_ten = get_asm_from_sen(segs.at(i + 1), true, true);
 									int add = 1;
 									result_ten->memsiz = right_ten->memsiz + add + 1;
 									result_ten->mem.NULLState();
@@ -2793,17 +2793,17 @@ public:
 										result_ten->mem.push_back(right_ten->mem[u]);
 									}
 
-									result_ten->mem.push_back(52);
-									result_ten->mem.push_back(216); // POP
+									result_ten->mem.push_back(52); // AXBY
+									result_ten->mem.push_back(216); // POP A
 
 									if (is_a)
 									{
-										int opp = basicoper[k].startop;
+										int opp = basicoper[k].startop; // A = !X
 										result_ten->mem.push_back((byte8)opp);
 									}
 									else
 									{
-										int opp = basicoper[k].startop + 1;
+										int opp = basicoper[k].startop + 1; // B = !X
 										result_ten->mem.push_back((byte8)opp);
 									}
 									result_ten->memsiz = result_ten->mem.size();
