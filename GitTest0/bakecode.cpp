@@ -3892,7 +3892,7 @@ public:
 
 				mem[writeup++] = 188; // jmp
 				*reinterpret_cast<uint *>(&mem[writeup]) =
-					(uint)blockstack.last()->parameter[1] - 1;
+					(uint)blockstack.last()->parameter[1];
 				writeup += 4;
 			}
 			break;
@@ -4460,7 +4460,7 @@ public:
 vecarr<InsideCode_Bake *> icbarr;
 
 bool isBreaking = false;
-int stopnum = 2418;
+int stopnum = 1742;
 
 int code_control(vecarr<InsideCode_Bake *> *icbarr)
 {
@@ -4611,7 +4611,7 @@ CONTEXT_SWITCH:
 	lfspi = reinterpret_cast<uint **>(lfsp);
 
 	if((int)(icb->pc - mem) == stopnum){
-		isBreaking = true;
+		//isBreaking = true;
 		cout << "Debug BreakPoint Check!" << endl;
 	}
 	goto *inst[**pc];
@@ -4633,7 +4633,7 @@ INSTEND:
 	}
 
 	if((int)(icb->pc - mem) == stopnum){
-		isBreaking = true;
+		//isBreaking = true;
 		cout << "Debug BreakPoint Check!" << endl;
 	}
 
