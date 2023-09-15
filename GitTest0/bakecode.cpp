@@ -3546,11 +3546,6 @@ public:
 				}
 			}
 
-			for (int i = 0; i < left_tm_ptr->memsiz; ++i)
-			{
-				mem[writeup++] = left_tm_ptr->mem[i];
-			}
-			mem[writeup++] = (byte8)199;
 			for (int i = 0; i < right_tm->memsiz; ++i)
 			{
 				mem[writeup++] = right_tm->mem[i];
@@ -3574,6 +3569,12 @@ public:
 					break;
 				}
 			}
+
+			for (int i = 0; i < left_tm_ptr->memsiz; ++i)
+			{
+				mem[writeup++] = left_tm_ptr->mem[i];
+			}
+			mem[writeup++] = (byte8)199;
 
 			switch (lstd->typesiz)
 			{
@@ -3627,12 +3628,7 @@ public:
 					need_casting = true;
 				}
 			}
-
-			for (int i = 0; i < left_tm->memsiz; ++i)
-			{
-				mem[writeup++] = left_tm->mem[i];
-			}
-			mem[writeup++] = (byte8)199;
+			
 			for (int i = 0; i < right_tm->memsiz; ++i)
 			{
 				mem[writeup++] = right_tm->mem[i];
@@ -3642,6 +3638,12 @@ public:
 				mem[writeup++] = (byte8)201;
 				mem[writeup++] = (byte8)castt;
 			}
+
+			for (int i = 0; i < left_tm->memsiz; ++i)
+			{
+				mem[writeup++] = left_tm->mem[i];
+			}
+			mem[writeup++] = (byte8)199;
 
 			switch (lstd->typesiz)
 			{
@@ -4545,7 +4547,7 @@ public:
 vecarr<InsideCode_Bake *> icbarr;
 
 bool isBreaking = false;
-int stopnum = -1;
+int stopnum = 2417;
 
 int code_control(vecarr<InsideCode_Bake *> *icbarr)
 {
